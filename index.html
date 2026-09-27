@@ -406,8 +406,10 @@
         <tr><th>补剂</th><th class="num">浓度</th><th>2026使用</th></tr>
         <tr><td class="l">艾尔钙 / 甘氨酸钙</td><td class="num">钙 50 mg/ml</td><td>2026口服钙主用</td></tr>
         <tr><td class="l">贝蒂喜 / 柠檬酸钙</td><td class="num">钙 50 mg/ml</td><td>2026少量使用</td></tr>
-        <tr><td class="l">艾尔铁 / 甘氨酸亚铁</td><td class="num">铁 3 mg/ml</td><td>2026口服铁主用（229条/48人）</td></tr>
+        <tr><td class="l">铁补充液(院内·浓度待药库核实)</td><td class="num">铁 ≈6.2 mg/ml</td><td>2026备注反推84%按此口径（P25-75=6.05-6.42）</td></tr>
+        <tr><td class="l">艾尔铁 / 甘氨酸亚铁</td><td class="num">铁 3 mg/ml</td><td>手册p55载值；2026备注16%按此口径</td></tr>
         <tr><td class="l">贝蒂喜菠菜铁</td><td class="num">铁 4 mg/ml</td><td>偶用</td></tr>
+        <tr><td class="l">贝蒂喜锌(甘氨酸锌)</td><td class="num">锌 4.5 mg/ml</td><td>2026备注79%按此口径（速查工具4.5属实）</td></tr>
         <tr><td class="l">艾尔锌 / 贝蒂嘉Z30 甘氨酸锌</td><td class="num">锌 3 mg/ml</td><td>2026口服锌主用（162条/39人）</td></tr>
         <tr><td class="l">瑞安吉 / 果糖二磷酸钠口服液</td><td class="num">磷 15.5mg(0.5mmol) + 钠 0.75mmol /ml</td><td>2026唯一口服磷（51条/18人），含钠计入总钠</td></tr>
         <tr><td class="l">(基)10%浓氯化钠针(扬州中宝)</td><td class="num">钠 1.7 mmol/ml</td><td>口服/鼻饲入奶</td></tr>
@@ -486,9 +488,11 @@ const CONC = {
   ca:  [{name:'艾尔钙(甘氨酸钙)', per:50,  unit:'mg', ord:'甘氨酸钙'},
         {name:'贝蒂喜(柠檬酸钙)', per:50,  unit:'mg', ord:'柠檬酸钙口服液'}],
   phos:[{name:'瑞安吉(果糖二磷酸钠口服液)', per:15.5, unit:'mg', na:0.75, ord:'果糖二磷酸钠口服液(瑞安吉)'}],
-  fe:  [{name:'艾尔铁(甘氨酸亚铁)', per:3, unit:'mg', ord:'甘氨酸亚铁'},
+  fe:  [{name:'铁补充液·院内(2026备注反推6.2)', per:6.2, unit:'mg', ord:'甘氨酸亚铁'},
+        {name:'艾尔铁(甘氨酸亚铁·手册3)', per:3, unit:'mg', ord:'甘氨酸亚铁'},
         {name:'贝蒂喜菠菜铁', per:4, unit:'mg', ord:'甘氨酸亚铁'}],
-  zn:  [{name:'艾尔锌(甘氨酸锌)', per:3, unit:'mg', ord:'甘氨酸锌'},
+  zn:  [{name:'贝蒂喜锌(2026主力4.5)', per:4.5, unit:'mg', ord:'甘氨酸锌'},
+        {name:'艾尔锌(甘氨酸锌·手册3)', per:3, unit:'mg', ord:'甘氨酸锌'},
         {name:'贝蒂嘉Z30(甘氨酸锌)', per:3, unit:'mg', ord:'甘氨酸锌'}],
   na:  [{name:'(基)10%浓氯化钠针(扬州中宝)', per:1.7, unit:'mmol', ord:'(基)10%浓氯化钠针(扬州中宝)'}],
   k:   [{name:'(基)15%氯化钾注射液', per:2, unit:'mmol', ord:'(基)15%氯化钾注射液'}],
@@ -507,9 +511,9 @@ const SUPPS = [
   {key:'phos', nm:'磷', tgt:[100,35], unit:'mg/kg/d', rng:'手册60–90/30–40 · 2026实际≈100', fq:'bid', fqs:['bid','q8h','tid','q6h','qd'],
    note:'瑞安吉1ml=磷15.5mg+钠0.75mmol，钠自动计入总钠'},
   {key:'fe', nm:'铁', tgt:[2.5,2.5], unit:'mg/kg/d', rng:'预防2–3 · 治疗4–6 · 2026治疗档≈5.1', fq:'bid', fqs:['bid','q6h','tid','q8h','q12h','qd'],
-   quick:true, note:'生后2–4周起补；贫血时点「治疗5」快切'},
+   quick:true, note:'生后2–4周起补；贫血时点「治疗5」快切。⚠️浓度:2026医嘱备注84%按6.2mg/ml反推(P25-75=6.05-6.42),16%按3mg/ml——请与药库核实院内铁补充液实际浓度后再选'},
   {key:'zn', nm:'锌', tgt:[3,1.5], unit:'mg/kg/d', rng:'速查1–2 · 2026实际≈3.1', fq:'bid', fqs:['bid','qd','q12h','tid','q8h','q6h'],
-   note:'2026标注医嘱总锌集中在2.9–3.3'},
+   note:'2026备注79%按贝蒂喜锌4.5mg/ml反推、12%按艾尔锌3mg/ml——默认贝蒂喜4.5,用艾尔锌时手动切换'},
   {key:'na', nm:'钠', tgt:[5,2.5], unit:'mmol/kg/d', rng:'手册3–5/2–3 · 2026实际≈5.4', fq:'q6h', fqs:['q6h','q8h','q12h','qd','bid','q4h'],
    mmol:true, note:'总量含奶钠与瑞安吉钠；超未成熟儿生后3天内谨慎'},
   {key:'k', nm:'钾', tgt:[2.5,2.5], unit:'mmol/kg/d', rng:'手册2–3', fq:'bid', fqs:['bid','qd','tid','q4h','q8h'],
