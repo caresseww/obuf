@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="口服补剂医嘱台">
+<meta name="theme-color" content="#0d6e6e">
+<meta name="format-detection" content="telephone=no">
+<title>口服补剂医嘱台 · 内部人员使用</title>
+<style>
+  :root{
+    --bg:#e9eeec;
+    --card:#ffffff;
+    --ink:#1c2624;
+    --ink2:#51605c;
+    --ink3:#8a968f;
+    --line:#e2e8e5;
+    --teal:#0d6e6e;
+    --teal-soft:#e3f0ee;
+    --amber:#c9742c;
+    --amber-soft:#fbf0e4;
+    --green:#2e9e5b;
+    --green-soft:#e6f4eb;
+    --orange:#dd9a2e;
+    --orange-soft:#fbf3e0;
+    --red:#cf4d3c;
+    --red-soft:#fbeae7;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue','Microsoft YaHei',sans-serif;
+    font-size:15px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 22px 90px;}
+
+  /* Header: 全宽通栏 + 永久固定顶栏（同PN处方台） */
+  .stickyhead{position:sticky;top:0;z-index:60;background:#e9eeec;box-shadow:0 2px 10px rgba(0,0,0,.10);}
+  .stickyhead .headinner{max-width:820px;margin:0 auto;padding:0 22px;}
+  header.top{padding:8px 0 0;background:linear-gradient(135deg,#0f7a7a 0%,#08494c 100%);}
+  .hero{
+    max-width:820px;margin:0 auto;padding:9px 0 8px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  }
+  .hero .t{display:flex;align-items:center;gap:10px;color:#fff;font-size:22px;font-weight:800;letter-spacing:2px;text-shadow:0 1px 3px rgba(0,0,0,.18);}
+  .hero .logo{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28);flex-shrink:0;}
+  .hero .badges{display:flex;align-items:center;gap:6px;}
+  .internal-badge{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,#e0893a,#c9742c);border-radius:999px;padding:3px 11px;letter-spacing:2.5px;box-shadow:0 2px 6px rgba(0,0,0,.18);white-space:nowrap;}
+  .ver-badge{font-size:10px;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.45);border-radius:999px;padding:1px 10px;letter-spacing:1px;text-align:center;white-space:nowrap;}
+  .top-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;padding-bottom:9px;}
+  body[data-page]:not([data-page="1"]) .top-actions{display:none;}
+  .btn{
+    appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;
+  }
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .btn.primary{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .btn.primary:hover{background:#0a5a5a;color:#fff;}
+  .btn.warn{background:var(--amber);color:#fff;border-color:var(--amber);}
+
+  /* 翻页（同PN处方台） */
+  nav.pager{
+    background:rgba(233,238,236,.96);backdrop-filter:blur(6px);padding:7px 0;
+    display:flex;gap:5px;border-bottom:1px solid var(--line);
+  }
+  .pager-inner{max-width:820px;margin:0 auto;display:flex;gap:5px;width:100%;padding:0 22px;}
+  nav.pager .ptab{
+    flex:1;appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink2);
+    padding:8px 2px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;
+  }
+  nav.pager .ptab.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+  section.card.page{display:none;}
+  section.card.page.active{display:block;}
+
+  /* Card（同PN处方台） */
+  section.card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:24px 24px 26px;margin-bottom:20px;margin-top:14px;scroll-margin-top:118px;
+  }
+  .card-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .card-head .step-no{
+    font-family:var(--mono);font-size:12px;color:#fff;background:var(--teal);
+    border-radius:6px;padding:2px 7px;flex-shrink:0;
+  }
+  .card-head h2{font-size:17px;margin:0;}
+  .card-sub{color:var(--ink2);font-size:13px;margin:0 0 18px;padding-left:2px;}
+
+  /* Inputs（同PN处方台） */
+  .grid{display:grid;gap:16px;}
+  .grid.c2{grid-template-columns:1fr 1fr;}
+  .grid.c3{grid-template-columns:1fr 1fr 1fr;}
+  .grid.c4{grid-template-columns:repeat(4,1fr);}
+  label.fld{display:block;}
+  label.fld .lab{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:5px;}
+  label.fld .lab .hint{color:var(--ink3);font-size:11px;margin-left:4px;}
+  .inp{
+    width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+    font-size:15px;color:var(--ink);background:#fbfcfb;font-family:inherit;
+  }
+  .inp:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .inp[readonly]{background:#eef4f2;color:var(--teal);font-weight:600;}
+  select.inp{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#8a968f 50%),linear-gradient(135deg,#8a968f 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px;}
+  .inp.mono{font-family:var(--mono);}
+  .tealbox{background:var(--teal-soft);border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+  .tealbox .t{font-weight:600;color:var(--teal);font-size:12px;margin-bottom:6px;}
+
+  /* 患儿槽位（同PN处方台） */
+  .slotwrap{background:var(--teal-soft);border-radius:10px;padding:10px 12px;margin-bottom:12px;}
+  .slot-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .slot-chip{flex:0 0 auto;border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .slot-chip.on{background:var(--teal);color:#fff;}
+  .slot-chip.filled:not(.on){border-color:#9fc5c0;background:#f2f9f7;}
+  .slot-quick{display:flex;gap:8px;margin-top:8px;align-items:center;}
+  .slot-quick .inp{flex:1;min-width:0;padding:7px 9px;font-size:14px;}
+  .slot-quick .btn{flex:0 0 auto;padding:7px 12px;font-size:12.5px;}
+  .slot-hint{font-size:11px;color:var(--ink3);margin-top:6px;}
+
+  /* 补剂行（PN iontile 风格） */
+  .iontile{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;margin-bottom:12px;}
+  .iontile.off{opacity:.5;}
+  .tile-head{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .tile-head .ion-name{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .tag{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;}
+  .tag.range{background:#eef4f2;color:var(--ink2);font-weight:500;}
+  .switch{width:40px;height:22px;border-radius:11px;background:#cdd6d2;position:relative;cursor:pointer;flex:0 0 auto;transition:.15s;}
+  .switch::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;}
+  .switch.on{background:var(--green);}
+  .switch.on::after{left:20px;}
+  .dotbtn{font-size:11px;color:var(--teal);cursor:pointer;user-select:none;white-space:nowrap;
+    border:1px solid var(--teal-soft);background:var(--teal-soft);border-radius:6px;padding:2px 8px;font-weight:600;}
+  .ion-calc{
+    margin-top:10px;background:#f5f8f7;border-radius:8px;padding:9px 12px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink2);line-height:1.8;
+  }
+  .ion-calc .res{color:var(--teal);font-weight:700;}
+  .ion-calc b{color:var(--ink);}
+  .hint{font-size:10.5px;color:var(--ink3);line-height:1.5;margin-top:4px;}
+  details.note{margin-top:6px;}
+  details.note summary{font-size:11px;color:var(--ink3);cursor:pointer;list-style:none;user-select:none;}
+  details.note summary::-webkit-details-marker{display:none;}
+  details.note summary::before{content:'▸';font-size:10px;margin-right:5px;transition:transform .2s;display:inline-block;}
+  details.note[open] summary::before{transform:rotate(90deg);}
+
+  .warnbox{background:var(--amber-soft);border:1px solid #ecd9c0;border-radius:10px;padding:9px 12px;font-size:12px;color:#7a4a14;margin-top:12px;line-height:1.65;}
+  .okbox{background:var(--green-soft);border:1px solid #cbe6d5;border-radius:10px;padding:9px 12px;font-size:12px;color:#1d5c37;margin-top:12px;line-height:1.65;}
+  .redbox{background:var(--red-soft);border:1px solid #ecc6be;border-radius:10px;padding:9px 12px;font-size:12px;color:#8a2f22;margin-top:12px;line-height:1.65;}
+
+  table.plain{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.plain th,table.plain td{border:1px solid var(--line);padding:5px 7px;text-align:left;}
+  table.plain th{background:#f2f6f4;color:var(--ink2);font-weight:600;font-size:11px;}
+  td.num,th.num{text-align:right;font-family:var(--mono);}
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+  /* 医嘱页黑白正式样式（同PN处方台） */
+  .order-card{
+    background:#fff;border:2px solid #1c2624;border-radius:0;
+    padding:20px 18px;font-family:var(--mono);
+  }
+  .order-card .ord-title{
+    text-align:center;font-size:17px;font-weight:700;color:#000;
+    letter-spacing:3px;margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid #000;
+  }
+  .order-card .ord-sub{text-align:center;font-size:11px;color:#666;margin-bottom:12px;}
+  .order-card .sec-title{
+    font-size:12px;font-weight:700;color:#000;margin:14px 0 4px;
+    padding-bottom:3px;border-bottom:1px solid #999;
+  }
+  .order-card .kv{display:flex;flex-wrap:wrap;gap:2px 18px;font-size:12.5px;margin:6px 0;}
+  .order-card .kv-item{white-space:nowrap;}
+  .order-card .kv .k{color:#555;min-width:56px;font-weight:400;}
+  .order-card .kv .v{font-weight:600;}
+  .order-card table.order{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px;}
+  .order-card table.order th{
+    text-align:left;color:#000;font-weight:700;font-size:11px;
+    padding:5px 6px;border-bottom:1.5px solid #000;border-top:1px solid #ccc;
+  }
+  .order-card table.order td{padding:6px 6px;border-bottom:0.5px solid #ddd;font-size:13px;vertical-align:top;}
+  .order-card table.order td.drug{font-weight:500;}
+  .order-card table.order td.num{font-family:var(--mono);white-space:nowrap;}
+  .order-card .foot-line{font-size:11px;color:#555;margin-top:12px;border-top:1px solid #999;padding-top:6px;}
+  .copy-row{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .copied{font-size:12.5px;color:var(--green);}
+
+  /* 参考值折叠面板（同PN处方台 details.ref） */
+  details.ref{margin-top:12px;border:1px solid var(--teal);border-radius:10px;overflow:hidden;}
+  details.ref summary{
+    cursor:pointer;padding:9px 14px;background:var(--teal-soft);color:var(--teal);
+    font-weight:600;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px;user-select:none;
+  }
+  details.ref summary::-webkit-details-marker{display:none;}
+  details.ref summary::before{content:'▸';font-size:11px;transition:transform .2s;}
+  details.ref[open] summary::before{transform:rotate(90deg);}
+  details.ref .ref-body{padding:14px 16px;background:#fff;}
+  details.ref table{width:100%;border-collapse:collapse;font-size:11.5px;margin:8px 0;}
+  details.ref th{background:var(--teal);color:#fff;padding:6px 4px;font-weight:600;font-size:11px;text-align:left;}
+  details.ref th.num{text-align:right;}
+  details.ref td{border:1px solid var(--line);padding:5px 6px;}
+  details.ref td.l{text-align:left;}
+  details.ref td.num{font-family:var(--mono);text-align:right;}
+  details.ref tr:nth-child(even) td{background:#f7faf9;}
+  details.ref .ref-tip{font-size:11.5px;color:var(--amber);background:var(--amber-soft);border-radius:6px;padding:8px 11px;margin:8px 0;line-height:1.7;}
+  details.ref .ref-src{font-size:10.5px;color:var(--ink3);margin-top:8px;font-style:italic;line-height:1.6;}
+  details.ref ul{padding-left:18px;font-size:12px;line-height:1.8;margin:6px 0;}
+
+  footer.foot{text-align:center;color:var(--ink3);font-size:11px;padding:10px 0 0;line-height:1.7;}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#fff;
+    border-radius:20px;padding:8px 18px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:99;}
+  .toast.show{opacity:.95;}
+
+  /* 手机适配（≤560px，同PN处方台） */
+  @media(max-width:560px){
+    .wrap{padding:0 12px 70px;}
+    .hero{padding:8px 0;}
+    .hero .t{font-size:16px;gap:8px;letter-spacing:.5px;}
+    .hero .logo{width:28px;height:28px;font-size:15px;border-radius:8px;}
+    .internal-badge{padding:2px 8px;letter-spacing:1.5px;font-size:10px;}
+    .ver-badge{display:none;}
+    .top-actions .btn{padding:5px 10px;font-size:11.5px;}
+    header.top{padding:8px 0 2px;}
+    .headinner{padding:0 12px;}
+    .pager-inner{padding:0 12px;}
+    nav.pager .ptab{padding:7px 2px;font-size:11.5px;}
+    section.card{padding:14px 14px 16px;border-radius:12px;margin-top:10px;}
+    .card-head h2{font-size:15.5px;}
+    .grid{gap:10px;}
+    .grid.c2,.grid.c3{grid-template-columns:1fr;}
+    .grid.c4{grid-template-columns:repeat(2,1fr);}
+    #s1 .grid.c4{grid-template-columns:repeat(4,1fr);gap:7px;}
+    #s1 .grid.c3{grid-template-columns:repeat(3,1fr);gap:7px;}
+    #s1 .grid.c2{grid-template-columns:1fr 1fr;gap:7px;}
+    .inp{padding:7px 8px;font-size:14px;}
+    label.fld .lab{font-size:10.5px;margin-bottom:2px;}
+    #s1 .tealbox{padding:9px 10px;margin-bottom:8px;}
+    .iontile{padding:10px 11px;}
+    .order-card{padding:12px 10px;}
+    .order-card .ord-title{font-size:15px;letter-spacing:2px;}
+    .order-card table.order td{padding:4px 5px;font-size:12.5px;}
+    details.ref summary{padding:6px 10px;font-size:11.5px;}
+    details.ref .ref-body{padding:10px 12px;}
+  }
+  @media(max-width:380px){
+    #s1 .grid.c4{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body data-page="1">
+<div class="stickyhead">
+  <header class="top">
+    <div class="hero">
+      <div class="t"><span class="logo">💊</span>口服补剂医嘱台</div>
+      <div class="badges"><span class="internal-badge">内部人员使用</span><span class="ver-badge">v2.1 · 2026-09</span></div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" onclick="loadExample()">载入范例</button>
+      <button class="btn" onclick="resetAll()">清空重填</button>
+    </div>
+  </header>
+  <div class="headinner">
+    <nav class="pager" id="nav">
+      <button class="ptab active" data-p="1">1 患儿·奶方</button>
+      <button class="ptab" data-p="2">2 补剂开单</button>
+      <button class="ptab" data-p="3">3 每顿明细</button>
+      <button class="ptab" data-p="4">4 医嘱</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===== 页1 患儿·奶方 ===== -->
+<section class="card page active" id="s1">
+  <div class="card-head"><span class="step-no">页 1</span><h2>患儿与奶方</h2></div>
+  <p class="card-sub">每顿奶量 × 顿数，全天自动算；渗透压按顿自动生成，无需手填。</p>
+
+  <div class="slotwrap">
+    <div style="font-weight:600;color:var(--teal);font-size:12px;margin-bottom:7px;">👶 患儿槽位 1–10 · 点标签切换 · 输入自动保存</div>
+    <div class="slot-chips" id="slotChips"></div>
+    <div class="slot-quick">
+      <input class="inp mono" id="bed" placeholder="床号">
+      <input class="inp mono" id="pname" placeholder="姓名">
+      <button class="btn primary" onclick="slotSaveTap()">💾 保存</button>
+      <button class="btn" onclick="slotClearTap()" title="清空本槽">🗑</button>
+    </div>
+    <div class="slot-hint">标签下显示床号/姓名；切到别的患儿算完，点回标签即恢复全部参数。</div>
+  </div>
+
+  <div class="tealbox">
+    <div class="t">👶 患儿基本信息</div>
+    <div class="grid c4">
+      <label class="fld"><span class="lab">体重 kg</span><input class="inp mono" id="wt" inputmode="decimal" placeholder="1.52"></label>
+      <label class="fld"><span class="lab">胎龄 周</span><input class="inp mono" id="ga" inputmode="numeric" placeholder="30"></label>
+      <label class="fld"><span class="lab">胎龄 天</span><input class="inp mono" id="gad" inputmode="numeric" placeholder="5"></label>
+      <label class="fld"><span class="lab">日龄 DOL</span><input class="inp mono" id="dol" inputmode="numeric" placeholder="18"></label>
+    </div>
+    <div class="grid c3" style="margin-top:10px;">
+      <label class="fld"><span class="lab">奶方</span><select class="inp" id="milk"></select></label>
+      <label class="fld"><span class="lab">每顿奶量 <span class="hint">ml/顿</span></span><input class="inp mono" id="vfeed" inputmode="decimal" placeholder="如 21"></label>
+      <label class="fld"><span class="lab">每天顿数</span><select class="inp" id="nfeed">
+        <option>12</option><option>10</option><option>9</option><option selected>8</option><option>7</option><option>6</option><option>5</option><option>4</option>
+      </select></label>
+    </div>
+    <div class="grid c2" style="margin-top:10px;">
+      <label class="fld"><span class="lab">喂养途径</span><select class="inp" id="route"><option>鼻饲</option><option>口服</option></select></label>
+      <label class="fld"><span class="lab">全天奶量 <span class="hint">自动=每顿×顿数÷体重</span></span><input class="inp mono" id="mvolAuto" readonly value="—"></label>
+    </div>
+  </div>
+
+  <div class="tealbox" style="margin-bottom:0;">
+    <div class="t">🥛 奶方已提供 <span class="hint" id="milkSub"></span></div>
+    <div id="milkIntake" class="ion-calc" style="margin-top:8px;background:#fff;"></div>
+  </div>
+
+  <div class="copy-row">
+    <button class="btn primary" onclick="switchPage(2)">下一步 → 页2 补剂开单</button>
+  </div>
+</section>
+
+<!-- ===== 页2 补剂开单 ===== -->
+<section class="card page" id="s2">
+  <div class="card-head"><span class="step-no">页 2</span><h2>补剂开单</h2></div>
+  <p class="card-sub">目标默认值=2026真实医嘱P50校准（见页4审核表）· 总量含奶 · 按差额补 · <span class="dotbtn" onclick="applyGA()">按胎龄重置目标值</span></p>
+
+  <div id="supps"></div>
+  <div id="warn"></div>
+
+  <div class="copy-row">
+    <button class="btn" onclick="switchPage(1)">← 页1</button>
+    <button class="btn primary" onclick="switchPage(3)">下一步 → 页3 每顿明细</button>
+  </div>
+</section>
+
+<!-- ===== 页3 每顿明细 ===== -->
+<section class="card page" id="s3">
+  <div class="card-head"><span class="step-no">页 3</span><h2>每顿明细</h2></div>
+  <p class="card-sub">顿奶量 · 奶里有多少 · 每顿加多少药 · 每顿渗透压（自动）。</p>
+  <div id="feedHead" class="ion-calc"></div>
+  <div class="tscroll"><table class="plain" id="feedTbl"></table></div>
+  <div id="osmBox"></div>
+  <details class="note"><summary>怎么读这张表 / 口径说明</summary>
+    <div class="hint" style="margin-top:6px;">
+      · 输入每顿奶量(ml/顿)和顿数，全天奶量自动算；「奶每顿含」= 奶方成分 × 顿奶量。<br>
+      · 「每次加药」列的 ml 直接抄入医嘱频次执行；渗透压=加了药的那顿的混合值（口径与2026真实标注核验一致）。<br>
+      · 电解质口径：钠、钾以 mmol 记；锌/铁/钙/磷按 mg 记但全部计入渗透压账（瑞安吉的钠占钠额度）。<br>
+      · 渗透压为本台估算，与营养科实测可能有差，调量后建议复测。
+    </div>
+  </details>
+
+  <div class="copy-row">
+    <button class="btn" onclick="switchPage(2)">← 页2</button>
+    <button class="btn primary" onclick="switchPage(4)">下一步 → 页4 医嘱</button>
+  </div>
+</section>
+
+<!-- ===== 页4 医嘱 ===== -->
+<section class="card page" id="s4">
+  <div class="card-head"><span class="step-no">页 4</span><h2>医嘱</h2></div>
+  <p class="card-sub">直接抄入HIS；「复制」输出同内容纯文本。</p>
+
+  <div class="order-card">
+    <div class="ord-title">口服补剂医嘱单</div>
+    <div class="ord-sub" id="ordSub"></div>
+    <div class="sec-title">喂养</div>
+    <div class="kv" id="ordFeedKv"></div>
+    <div class="sec-title">口服补剂医嘱</div>
+    <table class="order">
+      <thead><tr><th style="width:42%;">医嘱</th><th style="width:26%;">剂量 / 途径·频次</th><th>备注（总量拆分/渗透压）</th></tr></thead>
+      <tbody id="ordRows"></tbody>
+    </table>
+    <div class="foot-line">目标=2026真实医嘱校准（100条审核）· 写法=2026真实口径 · 须经上级医师审核后录入</div>
+  </div>
+
+  <div class="copy-row">
+    <button class="btn primary" onclick="copyOrder()">复制医嘱文本</button>
+    <button class="btn warn" onclick="exportImg()">生成黑白长图</button>
+    <span class="copied" id="copied"></span>
+  </div>
+  <div class="copy-row">
+    <button class="btn" onclick="switchPage(3)">← 页3</button>
+    <button class="btn" onclick="switchPage(1)">← 页1 改患儿</button>
+  </div>
+
+  <details class="ref"><summary>✅ 100条真实医嘱审核（2026-01~05 · 目标值校准依据）</summary>
+    <div class="ref-body">
+      <div class="ref-tip">方法：2026年带「总X=奶X+药X」总量标注的真实医嘱共227条，分层抽样100条回测本台——用真实标注反推本科室实际使用的目标值，与本台默认对照：</div>
+      <div class="tscroll"><table id="auditTbl"></table></div>
+      <ul>
+        <li><b>铁</b>：标注医嘱集中在治疗量档（P50 5.1，即贫血治疗4–6）——本台默认预防2.5，铁行提供「预防2.5 / 治疗5」快切；</li>
+        <li><b>锌 3.1 · 钙 152 · 磷 100 · 钠 5.4</b>：本台默认已按2026实际P50校准（手册区间为对照，速查工具的锌1–2口径偏低）；</li>
+        <li><b>钾</b>：标注仅3条（奶可覆盖大半），维持手册口径；</li>
+        <li>浓度换算（铁3/锌3/钙50mg/ml、瑞安吉磷15.5mg+钠0.75mmol/ml）已与2026「总X=奶+药」标注逐条反推核验一致。</li>
+      </ul>
+      <div class="ref-src">口径：治疗检索台orders全量缓存（2026年活跃13,142条/64患儿）· 标注正则提取目标值 · 2026-09-27冻结</div>
+    </div>
+  </details>
+
+  <details class="ref"><summary>📐 浓度速查（手册第六版p55 · 2026医嘱反推一致）</summary>
+    <div class="ref-body">
+      <div class="tscroll"><table>
+        <tr><th>补剂</th><th class="num">浓度</th><th>2026使用</th></tr>
+        <tr><td class="l">艾尔钙 / 甘氨酸钙</td><td class="num">钙 50 mg/ml</td><td>2026口服钙主用</td></tr>
+        <tr><td class="l">贝蒂喜 / 柠檬酸钙</td><td class="num">钙 50 mg/ml</td><td>2026少量使用</td></tr>
+        <tr><td class="l">艾尔铁 / 甘氨酸亚铁</td><td class="num">铁 3 mg/ml</td><td>2026口服铁主用（229条/48人）</td></tr>
+        <tr><td class="l">贝蒂喜菠菜铁</td><td class="num">铁 4 mg/ml</td><td>偶用</td></tr>
+        <tr><td class="l">艾尔锌 / 贝蒂嘉Z30 甘氨酸锌</td><td class="num">锌 3 mg/ml</td><td>2026口服锌主用（162条/39人）</td></tr>
+        <tr><td class="l">瑞安吉 / 果糖二磷酸钠口服液</td><td class="num">磷 15.5mg(0.5mmol) + 钠 0.75mmol /ml</td><td>2026唯一口服磷（51条/18人），含钠计入总钠</td></tr>
+        <tr><td class="l">(基)10%浓氯化钠针(扬州中宝)</td><td class="num">钠 1.7 mmol/ml</td><td>口服/鼻饲入奶</td></tr>
+        <tr><td class="l">(基)15%氯化钾注射液</td><td class="num">钾 2 mmol/ml</td><td>口服入奶用法存在</td></tr>
+        <tr><td class="l">维生素D滴剂(胶囊型)</td><td class="num">400 iu/粒</td><td>400iu qd主流，早产800iu</td></tr>
+        <tr><td class="l">维生素AD滴剂&lt;1岁(伊可新)</td><td class="num">VD 500 iu/粒</td><td>500iu qd主流（与VD滴剂常二选一）</td></tr>
+        <tr><td class="l">苏糖酸镁</td><td class="num">镁 65 mg/ml</td><td>2026未检出医嘱，备参考</td></tr>
+      </table></div>
+    </div>
+  </details>
+
+  <details class="ref"><summary>📏 手册第六版目标对照 + 红线提醒</summary>
+    <div class="ref-body">
+      <div class="tscroll"><table>
+        <tr><th>成分</th><th class="num">早产儿(手册)</th><th class="num">足月儿(手册)</th><th class="num">本台默认(2026校准)</th></tr>
+        <tr><td class="l">钙 mg/kg/d</td><td class="num">120–140</td><td class="num">60–80</td><td class="num">150 / 70</td></tr>
+        <tr><td class="l">磷 mg/kg/d</td><td class="num">60–90</td><td class="num">30–40</td><td class="num">100 / 35</td></tr>
+        <tr><td class="l">铁 mg/kg/d</td><td class="num">2–3（治疗4–6）</td><td class="num">1</td><td class="num">2.5（治疗快切5）</td></tr>
+        <tr><td class="l">锌 mg/kg/d</td><td class="num">1–2</td><td class="num">0.5–1</td><td class="num">3 / 1.5</td></tr>
+        <tr><td class="l">钠 mmol/kg/d</td><td class="num">3–5</td><td class="num">2–3</td><td class="num">5 / 2.5</td></tr>
+        <tr><td class="l">钾 mmol/kg/d</td><td class="num" colspan="2">2–3</td><td class="num">2.5</td></tr>
+        <tr><td class="l">维生素D iu/d</td><td class="num">800–1000（1–2周起）</td><td class="num">400</td><td class="num">800 / 400</td></tr>
+      </table></div>
+      <div class="ref-tip">⚠️ 红线：①地高辛用药期间禁止补钙；②见尿补钾、监测血钾心电图；③瑞安吉含钠0.75mmol/ml计入总钠；④混合奶渗透压≤450 mOsm/L；⑤铁剂足量前查铁蛋白/Hb，治疗量4–6须复盘血常规；⑥低钙抽搐急性期先静脉葡萄糖酸钙，口服补钙为维持/缺口补充。</div>
+    </div>
+  </details>
+
+  <details class="ref"><summary>🗂 数据口径与免责</summary>
+    <div class="ref-body">
+      <ul>
+        <li>目标值=2026-01~05本院真实医嘱P50校准（100条标注医嘱回测，见上），手册第六版区间为对照；</li>
+        <li>医嘱写法=2026真实医嘱口径（治疗检索台orders全量缓存：2026年活跃13,142条/64患儿，口服补剂相关约1,622条）；</li>
+        <li>奶方成分=营养科Excel 27种奶方（与速查工具同源）；</li>
+        <li>浓度=手册p55微量营养素表，与2026「总X=奶X+药X」标注反推核验一致；</li>
+        <li>渗透压=按顿混合估算（与2026真实标注核验：锌1.3ml入25ml母乳→估433.9 vs 标注429.9）。</li>
+      </ul>
+      <div class="ref-src">本台为医嘱起草辅助工具，完全离线运行（无任何网络请求），数据冻结于2026-09-27；生成文本须经上级医师审核后录入HIS。</div>
+    </div>
+  </details>
+</section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================== 数据（冻结自2026-09-27导出 · 完全离线） ==================== */
+const MILK = {"母乳": {"energy": 67, "protein": 1.4, "carb": 6.7, "fat": 3.9, "na": 25, "k": 57, "ca": 25, "p": 13, "fe": 0.12, "zn": 0.34, "vitA": 390, "vitD": 2, "osm": 280}, "母乳+1/4雀巢": {"energy": 71.35, "protein": 1.76, "carb": 7.02, "fat": 4.08, "na": 34.18, "k": 69.1, "ca": 43.9, "p": 24, "fe": 0.57, "zn": 0.58, "vitA": 667, "vitD": 37.2, "osm": 294.75}, "母乳+1/2雀巢": {"energy": 75.7, "protein": 2.12, "carb": 7.34, "fat": 4.26, "na": 43.36, "k": 81.2, "ca": 62.8, "p": 35, "fe": 1.02, "zn": 0.82, "vitA": 944, "vitD": 72.4, "osm": 309.5}, "母乳+3/4雀巢": {"energy": 80.05, "protein": 2.48, "carb": 7.66, "fat": 4.44, "na": 52.54, "k": 93.3, "ca": 81.7, "p": 46, "fe": 1.47, "zn": 1.06, "vitA": 1221, "vitD": 107.6, "osm": 324.25}, "母乳+4/4雀巢": {"energy": 84.4, "protein": 2.84, "carb": 7.98, "fat": 4.62, "na": 61.72, "k": 105.4, "ca": 100.6, "p": 57, "fe": 1.92, "zn": 1.3, "vitA": 1498, "vitD": 142.8, "osm": 339}, "母乳+5/4雀巢": {"energy": 88.75, "protein": 3.2, "carb": 8.3, "fat": 4.8, "na": 70.9, "k": 117.5, "ca": 119.5, "p": 68, "fe": 2.37, "zn": 1.54, "vitA": 1775, "vitD": 178, "osm": 353.75}, "母乳+1/5优博": {"energy": 70.9, "protein": 1.66, "carb": 7.29, "fat": 3.95, "na": 27, "k": 60, "ca": 40, "p": 21.5, "fe": 0.28, "zn": 0.41, "vitA": 597, "vitD": 30, "osm": 300}, "母乳+2/5优博": {"energy": 74.8, "protein": 1.92, "carb": 7.88, "fat": 4, "na": 29, "k": 63, "ca": 55, "p": 30, "fe": 0.44, "zn": 0.48, "vitA": 804, "vitD": 58, "osm": 320}, "母乳+3/5优博": {"energy": 78.7, "protein": 2.18, "carb": 8.47, "fat": 4.05, "na": 31, "k": 66, "ca": 70, "p": 38.5, "fe": 0.6, "zn": 0.55, "vitA": 1011, "vitD": 86, "osm": 340}, "母乳+4/5优博": {"energy": 82.6, "protein": 2.44, "carb": 9.06, "fat": 4.1, "na": 33, "k": 69, "ca": 85, "p": 47, "fe": 0.76, "zn": 0.62, "vitA": 1218, "vitD": 114, "osm": 360}, "母乳+5/5优博": {"energy": 86.5, "protein": 2.7, "carb": 9.65, "fat": 4.15, "na": 35, "k": 72, "ca": 100, "p": 55.5, "fe": 0.92, "zn": 0.69, "vitA": 1425, "vitD": 142, "osm": 380}, "蔼儿舒": {"energy": 68, "protein": 2.8, "carb": 7.5, "fat": 3.5, "na": 32, "k": 83, "ca": 68, "p": 46, "fe": 0.7, "zn": 0.7, "vitA": 200, "vitD": 50, "osm": 188}, "74蔼儿舒": {"energy": 74, "protein": 3.05, "carb": 8.16, "fat": 3.8, "na": 34.82, "k": 90.32, "ca": 74, "p": 50.06, "fe": 0.76, "zn": 0.76, "vitA": 218, "vitD": 54, "osm": 205}, "78蔼儿舒": {"energy": 78, "protein": 3.21, "carb": 8.6, "fat": 4, "na": 36.71, "k": 95.21, "ca": 78, "p": 52.76, "fe": 0.8, "zn": 0.8, "vitA": 229, "vitD": 57, "osm": 216}, "82蔼儿舒": {"energy": 82, "protein": 3.38, "carb": 9.04, "fat": 4.2, "na": 38.59, "k": 100.09, "ca": 82, "p": 55.47, "fe": 0.84, "zn": 0.84, "vitA": 241, "vitD": 60, "osm": 227}, "89蔼儿舒": {"energy": 89, "protein": 3.67, "carb": 9.82, "fat": 4.55, "na": 41.88, "k": 108.63, "ca": 89, "p": 60.21, "fe": 0.92, "zn": 0.92, "vitA": 262, "vitD": 65, "osm": 246}, "100蔼儿舒": {"energy": 100, "protein": 4.12, "carb": 11.03, "fat": 5.1, "na": 47.06, "k": 122.06, "ca": 100, "p": 67.65, "fe": 1.03, "zn": 1.03, "vitA": 294, "vitD": 74, "osm": 276}, "纽太特": {"energy": 67, "protein": 2.9, "carb": 7.05, "fat": 3.5, "na": 19.6, "k": 67.16, "ca": 50.37, "p": 35.59, "fe": 0.76, "zn": 0.5, "vitA": 200, "vitD": 50, "osm": 220}, "73纽太特": {"energy": 73, "protein": 3.16, "carb": 7.68, "fat": 3.8, "na": 21.36, "k": 73.17, "ca": 54.88, "p": 38.78, "fe": 0.83, "zn": 0.54, "vitA": 218, "vitD": 54, "osm": 240}, "77纽太特": {"energy": 77, "protein": 3.33, "carb": 8.1, "fat": 4, "na": 22.53, "k": 77.18, "ca": 57.89, "p": 40.9, "fe": 0.87, "zn": 0.57, "vitA": 230, "vitD": 57, "osm": 253}, "81纽太特": {"energy": 81, "protein": 3.5, "carb": 8.52, "fat": 4.2, "na": 23.7, "k": 81.19, "ca": 60.9, "p": 43.02, "fe": 0.92, "zn": 0.6, "vitA": 242, "vitD": 60, "osm": 266}, "88纽太特": {"energy": 88, "protein": 3.81, "carb": 9.26, "fat": 4.55, "na": 25.75, "k": 88.2, "ca": 66.17, "p": 46.73, "fe": 1, "zn": 0.65, "vitA": 263, "vitD": 65, "osm": 289}, "100纽太特": {"energy": 100, "protein": 4.33, "carb": 10.52, "fat": 5.1, "na": 29.25, "k": 100.23, "ca": 75.18, "p": 53.11, "fe": 1.13, "zn": 0.74, "vitA": 299, "vitD": 74, "osm": 328}, "纽康特": {"energy": 67, "protein": 2.9, "carb": 7, "fat": 3.5, "na": 28.3, "k": 79.4, "ca": 84.9, "p": 59.3, "fe": 1.1, "zn": 0.8, "vitA": 200, "vitD": 50, "osm": 360}, "纽荃星": {"energy": 100, "protein": 3.2, "carb": 9.9, "fat": 5.2, "na": 42, "k": 100, "ca": 101, "p": 57, "fe": 1, "zn": 0.9, "vitA": 300, "vitD": 75, "osm": 340}, "早产儿奶": {"energy": 80, "protein": 2.4, "carb": 8.6, "fat": 4.2, "na": 43.3, "k": 97.41, "ca": 122, "p": 72, "fe": 1.7, "zn": 1, "vitA": 733, "vitD": 124, "osm": 239}, "PDF奶": {"energy": 75, "protein": 2.2, "carb": 7.7, "fat": 3.8, "na": 34, "k": 92, "ca": 82, "p": 48, "fe": 1.37, "zn": 0.73, "vitA": 300, "vitD": 60, "osm": 312}};
+/* 100条真实医嘱审核（2026标注医嘱227条分层抽样100条反推目标值） */
+const AUDIT = {"rows": [{"nm": "铁", "n": 93, "p25": 4.1, "p50": 5.1, "p75": 5.8, "def": "2.5(预防)/5(治疗)", "ok": true}, {"nm": "锌", "n": 61, "p25": 2.9, "p50": 3.1, "p75": 3.3, "def": "3(早产)", "ok": true}, {"nm": "钙", "n": 12, "p25": 124.2, "p50": 152.5, "p75": 170.1, "def": "150(早产)", "ok": true}, {"nm": "磷", "n": 11, "p25": 95.2, "p50": 100.3, "p75": 100.3, "def": "100(早产)", "ok": true}, {"nm": "钠", "n": 47, "p25": 4.8, "p50": 5.4, "p75": 8.2, "def": "5(早产)", "ok": true}, {"nm": "钾", "n": 3, "p25": 3.65, "p50": 3.7, "p75": 4.5, "def": "2.5(手册口径)", "ok": false}]};
+
+/* 浓度表：perMl=每ml含元素量（mg/mmol/iu）；ord=医嘱名 */
+const CONC = {
+  ca:  [{name:'艾尔钙(甘氨酸钙)', per:50,  unit:'mg', ord:'甘氨酸钙'},
+        {name:'贝蒂喜(柠檬酸钙)', per:50,  unit:'mg', ord:'柠檬酸钙口服液'}],
+  phos:[{name:'瑞安吉(果糖二磷酸钠口服液)', per:15.5, unit:'mg', na:0.75, ord:'果糖二磷酸钠口服液(瑞安吉)'}],
+  fe:  [{name:'艾尔铁(甘氨酸亚铁)', per:3, unit:'mg', ord:'甘氨酸亚铁'},
+        {name:'贝蒂喜菠菜铁', per:4, unit:'mg', ord:'甘氨酸亚铁'}],
+  zn:  [{name:'艾尔锌(甘氨酸锌)', per:3, unit:'mg', ord:'甘氨酸锌'},
+        {name:'贝蒂嘉Z30(甘氨酸锌)', per:3, unit:'mg', ord:'甘氨酸锌'}],
+  na:  [{name:'(基)10%浓氯化钠针(扬州中宝)', per:1.7, unit:'mmol', ord:'(基)10%浓氯化钠针(扬州中宝)'}],
+  k:   [{name:'(基)15%氯化钾注射液', per:2, unit:'mmol', ord:'(基)15%氯化钾注射液'}],
+  vd:  [{name:'维生素D滴剂(胶囊型)', per:400, unit:'iu/粒', ord:'维生素D滴剂(胶囊型)'}],
+  ad:  [{name:'维生素AD滴剂<1岁(伊可新)', per:500, unit:'iu/粒', ord:'维生素AD滴剂<1岁(伊可新)'}],
+  mg2: [{name:'苏糖酸镁', per:65, unit:'mg', ord:'苏糖酸镁'}]
+};
+/* 渗透压系数 mOsm/ml（与2026真实标注核验校准） */
+const OSM_ML = {ca:7.82, fe:3.5, zn:3.404, na:3.4, k:4.0, mg2:8.32, phos:1.9};
+const FREQN = {'qd':1,'qod':0.5,'bid':2,'tid':3,'qid':4,'q6h':4,'q8h':3,'q12h':2,'q4h':6,'q3h':8,'q2h':12};
+
+/* 补剂定义：tgt=[早产,足月]默认（2026真实P50校准） */
+const SUPPS = [
+  {key:'ca', nm:'钙', tgt:[150,70], unit:'mg/kg/d', rng:'手册120–140/60–80 · 2026实际≈152', fq:'q8h', fqs:['q8h','tid','bid','q12h','qd','q4h'],
+   note:'2026实际：奶为主+小额补差（强化奶常已达标，药仅补缺口）'},
+  {key:'phos', nm:'磷', tgt:[100,35], unit:'mg/kg/d', rng:'手册60–90/30–40 · 2026实际≈100', fq:'bid', fqs:['bid','q8h','tid','q6h','qd'],
+   note:'瑞安吉1ml=磷15.5mg+钠0.75mmol，钠自动计入总钠'},
+  {key:'fe', nm:'铁', tgt:[2.5,2.5], unit:'mg/kg/d', rng:'预防2–3 · 治疗4–6 · 2026治疗档≈5.1', fq:'bid', fqs:['bid','q6h','tid','q8h','q12h','qd'],
+   quick:true, note:'生后2–4周起补；贫血时点「治疗5」快切'},
+  {key:'zn', nm:'锌', tgt:[3,1.5], unit:'mg/kg/d', rng:'速查1–2 · 2026实际≈3.1', fq:'bid', fqs:['bid','qd','q12h','tid','q8h','q6h'],
+   note:'2026标注医嘱总锌集中在2.9–3.3'},
+  {key:'na', nm:'钠', tgt:[5,2.5], unit:'mmol/kg/d', rng:'手册3–5/2–3 · 2026实际≈5.4', fq:'q6h', fqs:['q6h','q8h','q12h','qd','bid','q4h'],
+   mmol:true, note:'总量含奶钠与瑞安吉钠；超未成熟儿生后3天内谨慎'},
+  {key:'k', nm:'钾', tgt:[2.5,2.5], unit:'mmol/kg/d', rng:'手册2–3', fq:'bid', fqs:['bid','qd','tid','q4h','q8h'],
+   mmol:true, note:'见尿补钾；总量含奶钾（奶常可覆盖大半）'},
+  {key:'vd', nm:'维生素D', tgt:[800,400], unit:'iu/d', rng:'手册 早产800–1000(1–2周起)/足月400', fq:'qd', fqs:['qd'],
+   fixed:true, note:'2026实际：400iu为主、早产800iu；与伊可新常二选一'},
+  {key:'ad', nm:'伊可新AD', tgt:[500,500], unit:'iu/d', rng:'2026主流 500/1000', fq:'qd', fqs:['qd'],
+   fixed:true, note:'含维生素A；与VD滴剂常二选一，两开时注意总量'},
+  {key:'mg2', nm:'镁', tgt:[7.5,4], unit:'mg/kg/d', rng:'速查 5–10/3–5', fq:'bid', fqs:['bid','qd'],
+   off:true, note:'2026未检出医嘱，按需开启'}
+];
+
+/* ==================== 工具 ==================== */
+function g(id){var el=document.getElementById(id);return el?el.value:'';}
+function num(v){var x=parseFloat(v);return isNaN(x)?0:x;}
+function f2(x){if(!isFinite(x))return '—';var s=(Math.round(x*100)/100).toFixed(2);return s.replace(/\.?0+$/,'')||'0';}
+function r05(x){return Math.max(0.05,Math.round(x*20)/20);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);}
+function isPreterm(){return num(g('ga'))+num(g('gad'))/7<37;}
+
+/* ==================== 翻页 ==================== */
+function switchPage(n){
+  document.querySelectorAll('section.page').forEach(function(pg){pg.classList.remove('active');});
+  var el=document.getElementById('s'+n); if(el) el.classList.add('active');
+  document.querySelectorAll('.ptab').forEach(function(b){b.classList.toggle('active',+b.dataset.p===n);});
+  document.body.dataset.page=String(n);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.ptab').forEach(function(b){b.addEventListener('click',function(){switchPage(+b.dataset.p);});});
+
+/* ==================== 补剂行渲染 ==================== */
+function renderSupps(){
+  var box=document.getElementById('supps'); box.innerHTML='';
+  SUPPS.forEach(function(s){
+    var d=document.createElement('div'); d.className='iontile'+(s.on?'':' off'); d.id='supp_'+s.key;
+    var opts='';
+    (CONC[s.key]||[]).forEach(function(p,i){ opts+='<option value="'+i+'">'+p.name+'（'+p.per+' '+p.unit+'/ml）</option>'; });
+    var fopts=''; s.fqs.forEach(function(f){fopts+='<option '+(f===s.fq?'selected':'')+'>'+f+'</option>';});
+    var tgtHtml = s.fixed
+      ? '<label class="fld"><span class="lab">剂量 ('+s.unit+')</span><select class="inp" id="t_'+s.key+'">'+
+        (s.key==='vd'?'<option>400</option><option>800</option><option>1000</option>':'<option>500</option><option>1000</option>')+
+        '</select></label>'
+      : '<label class="fld"><span class="lab">目标总量 '+s.unit+'</span><input class="inp mono" id="t_'+s.key+'" inputmode="decimal" value="'+s.tgt[isPreterm()?0:1]+'"></label>';
+    var quick = s.quick? '<span class="dotbtn" onclick="setTgt(\'fe\',2.5)">预防2.5</span><span class="dotbtn" onclick="setTgt(\'fe\',5)">治疗5</span>' : '';
+    d.innerHTML =
+      '<div class="tile-head"><div class="ion-name"><div class="switch'+(s.on?' on':'')+'" onclick="tg(\''+s.key+'\')"></div>'+s.nm+
+      '<span class="tag range">'+s.rng+'</span>'+(quick?'<span>'+quick+'</span>':'')+'</div></div>'+
+      '<div class="grid c3" style="gap:8px;">'+
+        tgtHtml+
+        (s.fixed?'':'<label class="fld"><span class="lab">产品</span><select class="inp" id="p_'+s.key+'">'+opts+'</select></label>')+
+        '<label class="fld"><span class="lab">频次</span><select class="inp" id="f_'+s.key+'">'+fopts+'</select></label>'+
+      '</div>'+
+      '<div class="ion-calc" id="r_'+s.key+'"></div>'+
+      '<details class="note"><summary>说明</summary><div class="hint" style="margin-top:4px;">'+s.note+'</div></details>';
+    box.appendChild(d);
+  });
+  SUPPS.forEach(function(s){
+    ['t_','p_','f_'].forEach(function(pfx){var el=document.getElementById(pfx+s.key);
+      if(el){el.oninput=recalc;el.onchange=function(){recalc();};}});
+  });
+}
+function tg(key){
+  var s=SUPPS.find(function(x){return x.key===key;}); s.on=!s.on;
+  var d=document.getElementById('supp_'+key); d.className='iontile'+(s.on?'':' off'); recalc();
+}
+function setTgt(key,v){var el=document.getElementById('t_'+key);if(el){el.value=v;recalc();}}
+
+/* ==================== 核心计算 ==================== */
+function milkIntake(v){
+  var m=MILK[g('milk')]||MILK['母乳'];
+  return { m:m, v:v,
+    ca:m.ca*v/100, p:m.p*v/100, fe:m.fe*v/100, zn:m.zn*v/100,
+    na:m.na*v/100/23, k:m.k*v/100/39,
+    vd:m.vitD*v/100, osm:m.osm };
+}
+function calc(){
+  var W=num(g('wt'))||1, nf=Math.max(1,num(g('nfeed')));
+  var Vf=num(g('vfeed')), vAbs=Vf*nf;
+  var mi=milkIntake(vAbs/W);
+  var out={};
+  SUPPS.forEach(function(s){
+    if(!s.on) return;
+    var o={s:s};
+    if(s.key==='vd'||s.key==='ad'){ o.iu=num(g('t_'+s.key)); out[s.key]=o; return; }
+    var tgt=num(g('t_'+s.key));
+    var ci=parseInt(g('p_'+s.key)||0)||0;
+    var p=CONC[s.key][ci];
+    var per=p.per, milk=(s.key==='ca')?mi.ca:(s.key==='phos')?mi.p:(s.key==='fe')?mi.fe:(s.key==='zn')?mi.zn:(s.key==='na')?mi.na:(s.key==='k')?mi.k:0;
+    if(s.key==='mg2') milk=0;
+    var need=Math.max(0,tgt-milk);
+    var mlkg=need/per, mlD=mlkg*W;
+    var fn=FREQN[g('f_'+s.key)]||1;
+    o.tgt=tgt; o.milk=milk; o.need=need; o.mlkg=mlkg; o.mlD=mlD; o.ml=r05(mlD/fn); o.fn=fn; o.pname=p.name;
+    o.tiny = need>0 && mlD<0.15 && s.key!=='mg2';
+    if(s.key==='phos') o.naFromPhos=mlkg*0.75;
+    out[s.key]=o;
+  });
+  var naExtra = out.phos? out.phos.naFromPhos : 0;
+  if(out.na){
+    var naTgt=num(g('t_na'));
+    var naNeed=Math.max(0, naTgt - mi.na - naExtra);
+    var naMlD=naNeed/1.7*W;
+    var fnNa=FREQN[g('f_na')]||1;
+    out.na.need=naNeed; out.na.mlkg=naNeed/1.7; out.na.mlD=naMlD; out.na.ml=r05(naMlD/fnNa);
+    out.na.tiny = naNeed>0 && naMlD<0.15;
+    out.na.milk=mi.na; out.na.other=naExtra;
+  }
+  /* 每顿渗透压（自动）：按频次分组，同频次药落同几顿（口径与2026真实标注核验一致） */
+  var osmMap={}, worst={osm:mi.osm, drugs:'无加药', fn:nf};
+  ['ca','phos','fe','zn','na','k','mg2'].forEach(function(key){
+    var o=out[key]; if(!o||o.need<=0||o.tiny)return;
+    var fn=o.fn; var grp=osmMap[fn]=osmMap[fn]||{add:0,vol:0,drugs:[]};
+    var perFeedMl=o.mlD/fn;
+    grp.add+=OSM_ML[key]*perFeedMl*1000; grp.vol+=perFeedMl; grp.drugs.push(o.s.nm);
+  });
+  Object.keys(osmMap).forEach(function(fn){
+    var grp=osmMap[fn];
+    grp.osm=(mi.osm*Vf+grp.add)/(Vf+grp.vol);
+    if(grp.osm>worst.osm){worst={osm:grp.osm, drugs:grp.drugs.join('+'), fn:parseInt(fn)};}
+  });
+  return {mi:mi, out:out, W:W, nf:nf, Vf:Vf, vAbs:vAbs, osmMap:osmMap, worst:worst, naExtra:naExtra};
+}
+
+/* ==================== 渲染 ==================== */
+function renderMilk(c){
+  var m=c.mi;
+  var mva=document.getElementById('mvolAuto');
+  if(mva) mva.value=c.mi.v>0? (f2(c.vAbs)+' ml/d = '+f2(c.mi.v)+' ml/kg/d') : '—';
+  document.getElementById('milkSub').textContent='（'+g('milk')+' 每顿'+f2(c.Vf)+'ml × '+c.nf+'顿 · 每100ml：钙'+m.m.ca+' 磷'+m.m.p+' 铁'+m.m.fe+' 锌'+m.m.zn+' 钠'+m.m.na+' 钾'+m.m.k+'mg · 渗透压'+m.m.osm+'）';
+  document.getElementById('milkIntake').innerHTML =
+    '钙 <b>'+f2(m.ca)+'</b> · 磷 <b>'+f2(m.p)+'</b> · 铁 <b>'+f2(m.fe)+'</b> · 锌 <b>'+f2(m.zn)+'</b> mg/kg/d　｜　'+
+    '钠 <b>'+f2(m.na)+'</b> · 钾 <b>'+f2(m.k)+'</b> mmol/kg/d　｜　维D <b>'+f2(m.vd)+'</b> iu/d　｜　奶渗透压 '+m.m.osm;
+}
+function renderRows(c){
+  SUPPS.forEach(function(s){
+    var el=document.getElementById('r_'+s.key); if(!el)return;
+    var o=c.out[s.key];
+    if(!s.on){el.innerHTML='<span style="color:var(--ink3)">未开</span>';return;}
+    if(s.key==='vd'||s.key==='ad'){
+      el.innerHTML=CONC[s.key][0].name+' <b>'+num(g('t_'+s.key))+' iu</b> <span class="res">口服 qd</span>'; return;
+    }
+    var unit=s.mmol?'mmol':'mg';
+    var split='总'+s.nm+' <span class="res">'+f2(o.tgt)+'='+f2(o.milk)+'(奶)+'+f2(o.need)+'(药)</span> '+unit+'/kg/d'+
+      (s.key==='phos'&&o.naFromPhos>0?'　｜　<span style="color:var(--amber)">带钠+'+f2(o.naFromPhos)+'mmol/kg/d</span>':'')+
+      (s.key==='na'&&o.other>0?'　｜　其中瑞安吉钠'+f2(o.other):'');
+    el.innerHTML=split+(o.need<=0
+      ?'　<span style="color:var(--green)">✓ 奶已够，无需补</span>'
+      :(o.tiny
+        ?'　<span style="color:var(--green)">✓ 缺口极小（全日<0.15ml），无需另开</span>'
+        :'<br>→ <b>'+o.pname+'</b> <b>'+f2(o.ml)+'</b> ml/次 × '+o.fn+'次/日 = '+f2(o.mlD)+' ml/d'));
+  });
+  var warns=[];
+  if(num(g('dol'))>0&&num(g('dol'))<14&&(c.out.fe&&c.out.fe.need>0)) warns.push('铁剂手册建议生后2–4周起补，日龄<14天请核对');
+  if(c.out.phos&&!c.out.na) warns.push('已开瑞安吉：其含钠'+f2(c.naExtra)+'mmol/kg/d 未在钠行体现（钠行未开）');
+  if(c.out.vd&&c.out.ad) warns.push('VD滴剂与伊可新同时开启：合计维D '+(num(g('t_vd'))+num(g('t_ad')))+' iu/d，本院常二选一');
+  if(c.out.k&&c.out.k.need>0) warns.push('补钾遵循见尿补钾');
+  if(c.Vf>0){
+    if(c.worst.osm>450) warns.push('渗透压估算：最高一顿 '+Math.round(c.worst.osm*10)/10+'（'+c.worst.drugs+'顿）>450红线——减药量或换低渗奶方');
+    else if(c.worst.osm>=410) warns.push('渗透压估算：最高一顿 '+Math.round(c.worst.osm*10)/10+'（'+c.worst.drugs+'顿），接近450红线，调量后复测');
+  }
+  document.getElementById('warn').innerHTML = warns.length? '<div class="warnbox">⚠️ '+warns.join('；')+'</div>' :
+    '<div class="okbox">✓ 目标按胎龄'+(isPreterm()?'<37周(早产)':'≥37周(足月)')+'默认（2026真实医嘱校准）；核对后到页3看每顿明细、页4抄医嘱</div>';
+}
+
+/* ==================== 医嘱数据行（文本+表格共用） ==================== */
+function orderRows(){
+  var c=calc(); var route=g('route');
+  function tail(o){ var grp=c.osmMap[o.fn]; return (grp&&grp.osm)?('渗透压'+(Math.round(grp.osm*10)/10)):''; }
+  function prodOf(key){return CONC[key][parseInt(g('p_'+key)||0)||0];}
+  var rows=[];
+  function add(name,doseML,rt,fq,remark){rows.push({name:name,ml:doseML,route:rt,fq:fq,remark:remark});}
+  if(c.out.ca&&c.out.ca.need>0&&!c.out.ca.tiny) add(prodOf('ca').ord,f2(c.out.ca.ml),route,g('f_ca'),'与奶同服 总钙'+f2(c.out.ca.tgt)+'=奶'+f2(c.out.ca.milk)+'+药'+f2(c.out.ca.need)+','+tail(c.out.ca));
+  if(c.out.phos&&c.out.phos.need>0&&!c.out.phos.tiny) add(prodOf('phos').ord,f2(c.out.phos.ml),route,g('f_phos'),'总磷'+f2(c.out.phos.tgt)+'=奶'+f2(c.out.phos.milk)+'+药'+f2(c.out.phos.need)+' 含钠'+f2(c.out.phos.naFromPhos)+'mmol/kg,'+tail(c.out.phos));
+  if(c.out.fe&&c.out.fe.need>0&&!c.out.fe.tiny) add(prodOf('fe').ord,f2(c.out.fe.ml),route,g('f_fe'),'总铁'+f2(c.out.fe.tgt)+'=奶'+f2(c.out.fe.milk)+'+药'+f2(c.out.fe.need)+','+tail(c.out.fe));
+  if(c.out.zn&&c.out.zn.need>0&&!c.out.zn.tiny) add(prodOf('zn').ord,f2(c.out.zn.ml),route,g('f_zn'),'总锌'+f2(c.out.zn.tgt)+'=奶'+f2(c.out.zn.milk)+'+药'+f2(c.out.zn.need)+','+tail(c.out.zn));
+  if(c.out.na&&c.out.na.need>0&&!c.out.na.tiny) add(prodOf('na').ord,f2(c.out.na.ml),route,g('f_na'),'入奶 总钠'+f2(num(g('t_na')))+'=奶'+f2(c.out.na.milk)+(c.naExtra>0?'+瑞安吉'+f2(c.naExtra):'')+'+药'+f2(c.out.na.need)+','+tail(c.out.na));
+  if(c.out.k&&c.out.k.need>0&&!c.out.k.tiny) add(prodOf('k').ord,f2(c.out.k.ml),route,g('f_k'),'入奶 总钾'+f2(num(g('t_k')))+'=奶'+f2(c.out.k.milk)+'+药'+f2(c.out.k.need)+','+tail(c.out.k));
+  if(c.out.mg2&&c.out.mg2.need>0&&!c.out.mg2.tiny) add(prodOf('mg2').ord,f2(c.out.mg2.ml),route,g('f_mg2'),'镁'+f2(c.out.mg2.need)+'mg/kg/d');
+  if(c.out.vd) add(prodOf('vd').ord,num(g('t_vd'))+'(iu)','口服','qd','');
+  if(c.out.ad) add(prodOf('ad').ord,num(g('t_ad'))+'(iu)','口服','qd','');
+  return {c:c, route:route, rows:rows};
+}
+/* 纯文本（复制/长图用） */
+function orderText(){
+  var R=orderRows(), c=R.c;
+  var lines=[];
+  lines.push('床号'+(g('bed')||'__')+' '+(g('pname')||'__')+' W'+(g('wt')||'__')+'kg 胎龄'+(g('ga')||'__')+'+'+(num(g('gad')))+'d DOL'+(g('dol')||'__')+'d '+
+    g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿('+f2(c.mi.v)+'ml/kg/d) q'+(24/c.nf).toFixed(0)+'h '+R.route);
+  R.rows.forEach(function(r,i){
+    var dose = r.name.indexOf('维生素')===0? r.ml : r.ml+'(ml)';
+    lines.push((i+1)+'. '+r.name+' '+dose+' '+r.route+' '+r.fq+(r.remark?' '+r.remark:''));
+  });
+  lines.push('——目标=2026真实医嘱校准·写法=2026真实口径·上级审核后录入——');
+  return lines.join('\n');
+}
+/* 正式医嘱单表格渲染 */
+function renderOrderCard(){
+  var R=orderRows(), c=R.c;
+  document.getElementById('ordSub').textContent='床号 '+(g('bed')||'__')+' · '+(g('pname')||'__')+' · '+new Date().toLocaleDateString('zh-CN');
+  document.getElementById('ordFeedKv').innerHTML=
+    '<span class="kv-item"><span class="k">体重</span> <span class="v">'+(g('wt')||'__')+'kg</span></span>'+
+    '<span class="kv-item"><span class="k">胎龄</span> <span class="v">'+(g('ga')||'__')+'+'+num(g('gad'))+'d</span></span>'+
+    '<span class="kv-item"><span class="k">DOL</span> <span class="v">'+(g('dol')||'__')+'d</span></span>'+
+    '<span class="kv-item"><span class="k">奶方</span> <span class="v">'+g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿（'+f2(c.mi.v)+'ml/kg/d）q'+(24/c.nf).toFixed(0)+'h '+R.route+'</span></span>';
+  var tb=document.getElementById('ordRows'); var html='';
+  R.rows.forEach(function(r){
+    var dose = r.name.indexOf('维生素')===0? r.ml : r.ml+' ml/次';
+    html+='<tr><td class="drug">'+esc(r.name)+'</td><td class="num">'+dose+'<br><span style="font-size:11px;color:#555;">'+r.route+' '+r.fq+'</span></td><td style="font-size:11.5px;">'+esc(r.remark)+'</td></tr>';
+  });
+  if(!html) html='<tr><td colspan="3" style="color:#2e9e5b;">✓ 当前奶方各成分已达目标，无需加补剂（仅维生素）</td></tr>';
+  tb.innerHTML=html;
+}
+
+/* ==================== 每顿明细 ==================== */
+function renderFeed(c){
+  var fh=document.getElementById('feedHead'), tb=document.getElementById('feedTbl'), ob=document.getElementById('osmBox');
+  var nf=c.nf, W=c.W, Vf=c.Vf, m=c.mi.m;
+  if(!(Vf>0)){ fh.innerHTML='<span style="color:var(--ink3)">在页1填入每顿奶量后，这里显示每顿明细</span>'; tb.innerHTML=''; ob.innerHTML=''; return; }
+  fh.innerHTML='顿奶量 <b>'+f2(Vf)+' ml</b> × '+nf+'顿 = '+f2(c.vAbs)+' ml/d（'+f2(c.mi.v)+'ml/kg/d）　｜　奶基础渗透压 '+m.osm+' mOsm/L';
+  var milkPer={ca:m.ca*Vf/100, p:m.p*Vf/100, fe:m.fe*Vf/100, zn:m.zn*Vf/100, na:m.na*Vf/100/23, k:m.k*Vf/100/39};
+  var rows='<tr><th>补剂</th><th class="num">每次加药</th><th class="num">×次/日</th><th class="num">该次供X（奶+药）</th><th class="num">该顿渗透压</th></tr>';
+  var any=false;
+  ['ca','phos','fe','zn','na','k','mg2'].forEach(function(key){
+    var o=c.out[key]; if(!o||o.need<=0||o.tiny)return; any=true;
+    var s=o.s;
+    var elem={ca:['钙',milkPer.ca,'mg'],phos:['磷',milkPer.p,'mg'],fe:['铁',milkPer.fe,'mg'],zn:['锌',milkPer.zn,'mg'],na:['钠',milkPer.na,'mmol'],k:['钾',milkPer.k,'mmol'],mg2:['镁',0,'mg']}[key];
+    var perDoseElem=o.need*W/o.fn;
+    var grp=c.osmMap[o.fn];
+    rows+='<tr><td>'+s.nm+(key==='phos'?'<span style="color:var(--amber)">（带钠'+f2(o.mlD*0.75/o.fn)+'mmol/次）</span>':'')+'</td>'+
+      '<td class="num"><b>'+f2(o.ml)+' ml</b></td><td class="num">'+o.fn+'</td>'+
+      '<td class="num">'+f2(elem[1])+'+'+f2(perDoseElem)+'='+f2(elem[1]+perDoseElem)+' '+elem[2]+'</td>'+
+      '<td class="num">'+(grp&&grp.osm?Math.round(grp.osm*10)/10:'—')+'</td></tr>';
+  });
+  if(!any) rows+='<tr><td colspan="5" style="color:var(--green)">✓ 当前奶方各成分已达目标，无需加药</td></tr>';
+  tb.innerHTML=rows;
+  var w=c.worst;
+  if(!any){
+    ob.innerHTML='<div class="okbox">🧪 每顿渗透压 <b>'+m.osm+'</b>（纯奶，无加药）。</div>';
+  }else if(w.osm>450){
+    ob.innerHTML='<div class="redbox">🧪 每顿渗透压（自动估算）：最高一顿 <b>'+Math.round(w.osm*10)/10+'</b>（'+w.drugs+'的顿，q'+(24/w.fn)+'h）已超450红线——减药量或换低渗奶方。</div>';
+  }else if(w.osm>=410){
+    ob.innerHTML='<div class="warnbox">🧪 每顿渗透压（自动估算）：最高一顿 <b>'+Math.round(w.osm*10)/10+'</b>（'+w.drugs+'的顿，q'+(24/w.fn)+'h），接近450红线；调量后建议复测。</div>';
+  }else{
+    ob.innerHTML='<div class="okbox">🧪 每顿渗透压（自动估算）：最高一顿 <b>'+Math.round(w.osm*10)/10+'</b>（'+w.drugs+'的顿，q'+(24/w.fn)+'h），450红线内。</div>';
+  }
+}
+
+function recalc(){
+  var c=calc();
+  renderMilk(c); renderRows(c); renderFeed(c); renderOrderCard();
+  slotAutoSave();
+}
+function copyOrder(){
+  var t=orderText();
+  var done=function(){var e=document.getElementById('copied');e.textContent='✓ 已复制';setTimeout(function(){e.textContent='';},2000);toast('医嘱已复制');};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done);}
+  else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+}
+function applyGA(){
+  var pt=isPreterm();
+  SUPPS.forEach(function(s){ if(s.fixed)return;
+    var el=document.getElementById('t_'+s.key); if(el) el.value=s.tgt[pt?0:1]; });
+  var vd=document.getElementById('t_vd'); if(vd) vd.value=pt?'800':'400';
+  recalc(); toast('已按'+(pt?'早产':'足月')+'目标重置');
+}
+function loadExample(){
+  slotApply({bed:'12',pname:'示范',wt:'1.50',ga:'30',gad:'5',dol:'20',milk:'母乳',vfeed:'21',route:'鼻饲',nfeed:'8'});
+  recalc(); toast('已载入范例：1.5kg 早产儿 纯母乳 21ml×8');
+}
+function resetAll(){
+  slotApply({bed:'',pname:'',wt:'',ga:'',gad:'',dol:'',milk:'母乳',vfeed:'',route:'鼻饲',nfeed:'8'});
+  applyGA(); toast('已清空');
+}
+
+/* ==================== 审核表 ==================== */
+function renderAudit(){
+  var rows='<tr><th>元素</th><th class="num">标注n</th><th class="num">P25</th><th class="num">P50</th><th class="num">P75</th><th class="num">本台默认</th><th>校准</th></tr>';
+  AUDIT.rows.forEach(function(r){
+    rows+='<tr><td class="l">'+r.nm+'</td><td class="num">'+r.n+'</td><td class="num">'+r.p25+'</td><td class="num">'+r.p50+'</td><td class="num">'+r.p75+'</td><td class="num">'+r.def+'</td><td class="l">'+(r.ok?'✓ 默认=P50':'—')+'</td></tr>';
+  });
+  document.getElementById('auditTbl').innerHTML=rows;
+}
+
+/* ==================== 黑白长图 ==================== */
+function exportImg(){
+  var c=calc(); var W=750, SC=2, pad=28;
+  var R=orderRows();
+  var tbl=[['成分','奶','药','总量','单位','ml/次×次/日']];
+  SUPPS.forEach(function(s){
+    var o=c.out[s.key]; if(!o)return;
+    if(s.key==='vd'||s.key==='ad'){tbl.push([s.nm,'—','—',num(g('t_'+s.key)),'iu','—']);return;}
+    if(o.need<=0||o.tiny)return;
+    tbl.push([s.nm,f2(o.milk),f2(o.need),f2(o.tgt),s.mmol?'mmol/kg/d':'mg/kg/d',f2(o.ml)+'×'+o.fn]);
+  });
+  var H=pad*2+70+tbl.length*28+(R.rows.length)*30+110;
+  var cv=document.createElement('canvas');
+  cv.width=W*SC; cv.height=H*SC;
+  var ctx=cv.getContext('2d'); ctx.scale(SC,SC);
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#000';
+  var y=pad;
+  ctx.font='bold 24px -apple-system,PingFang SC,sans-serif';
+  ctx.textAlign='center'; ctx.fillText('口服补剂医嘱单',W/2,y+20);
+  ctx.textAlign='left';
+  y+=34; ctx.font='13px -apple-system,PingFang SC,sans-serif';
+  ctx.fillText('床号'+(g('bed')||'__')+' '+(g('pname')||'__')+' W'+(g('wt')||'__')+'kg 胎龄'+(g('ga')||'__')+'+'+num(g('gad'))+'d DOL'+(g('dol')||'__')+'d',pad,y);
+  y+=24;
+  ctx.fillText(g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿('+f2(c.mi.v)+'ml/kg/d) q'+(24/c.nf).toFixed(0)+'h '+R.route,pad,y);
+  y+=16; ctx.strokeStyle='#000';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke(); y+=12;
+  var colX=[pad,pad+90,pad+185,pad+280,pad+380,pad+490];
+  ctx.font='bold 13px monospace';
+  tbl[0].forEach(function(h,i){ctx.fillText(h,colX[i],y);});
+  y+=6;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();y+=20;
+  ctx.font='13px monospace';
+  for(var i=1;i<tbl.length;i++){ tbl[i].forEach(function(cell,j){ctx.fillText(String(cell),colX[j],y);}); y+=24; }
+  y+=12; ctx.font='13px monospace';
+  R.rows.forEach(function(r,i){
+    var dose = r.name.indexOf('维生素')===0? r.ml : r.ml+'ml';
+    var t=(i+1)+'. '+r.name+' '+dose+' '+r.route+' '+r.fq+(r.remark?'  '+r.remark:'');
+    if(t.length>52) t=t.slice(0,52)+'…';
+    ctx.fillText(t,pad,y); y+=26;
+  });
+  y+=10; ctx.font='11px -apple-system,PingFang SC,sans-serif';ctx.fillStyle='#555';
+  ctx.fillText('目标=2026真实医嘱校准(100条审核) · 须经上级医师审核 · '+new Date().toLocaleString('zh-CN'),pad,H-16);
+  cv.toBlob(function(blob){
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='口服补剂医嘱_'+(g('bed')||'')+'床_'+(g('pname')||'')+'.png';a.click();
+    toast('长图已生成');
+  });
+}
+
+/* ==================== 槽位(1-10) ==================== */
+var SKEY='oralSuppDeskV2', curSlot=0, slotTimer=null;
+function slotsDB(){try{return JSON.parse(localStorage.getItem(SKEY))||{};}catch(e){return {};}}
+function slotsSave(db){try{localStorage.setItem(SKEY,JSON.stringify(db));}catch(e){}}
+function slotFields(){return ['bed','pname','wt','ga','gad','dol','milk','vfeed','route','nfeed'];}
+function slotCapture(){var o={};slotFields().forEach(function(f){o[f]=g(f);});return o;}
+function slotApply(o){if(!o)return;slotFields().forEach(function(f){var el=document.getElementById(f);if(el&&o[f]!==undefined)el.value=o[f];});}
+function renderSlotChips(){
+  var db=slotsDB(),box=document.getElementById('slotChips');box.innerHTML='';
+  for(var i=0;i<10;i++){
+    var s=db[i]||{};var nm=(s.bed?s.bed+'床':'')+(s.pname||'');
+    var d=document.createElement('div');d.className='slot-chip'+(i===curSlot?' on':'')+(nm?' filled':'');
+    d.textContent=(i+1)+'·'+(nm||'空');d.onclick=function(i){return function(){slotSwitch(i);};}(i);
+    box.appendChild(d);
+  }
+}
+function slotSwitch(i){
+  dbSave(); curSlot=i; var db=slotsDB();
+  var fresh={bed:'',pname:'',wt:'',ga:'',gad:'',dol:'',milk:g('milk'),vfeed:'',route:'鼻饲',nfeed:'8'};
+  slotApply(db[i]||fresh); renderSlotChips(); recalc();
+}
+function dbSave(){var db=slotsDB();db[curSlot]=slotCapture();slotsSave(db);}
+function slotAutoSave(){clearTimeout(slotTimer);slotTimer=setTimeout(function(){dbSave();renderSlotChips();},600);}
+function slotSaveTap(){dbSave();renderSlotChips();toast('槽位'+(curSlot+1)+'已保存');}
+function slotClearTap(){var db=slotsDB();delete db[curSlot];slotsSave(db);
+  slotApply({bed:'',pname:'',wt:'',ga:'',gad:'',dol:'',milk:'母乳',vfeed:'',route:'鼻饲',nfeed:'8'});
+  renderSlotChips();recalc();toast('已清空槽位'+(curSlot+1));}
+
+/* ==================== 初始化 ==================== */
+function init(){
+  var sel=document.getElementById('milk');
+  Object.keys(MILK).forEach(function(k){var o=document.createElement('option');o.textContent=k;sel.appendChild(o);});
+  sel.value='母乳+4/4雀巢';
+  SUPPS.forEach(function(s){s.on=!s.off;});
+  renderSupps(); renderAudit(); renderSlotChips();
+  var db=slotsDB(); if(db[0]) slotApply(db[0]);
+  ['bed','pname','wt','ga','gad','dol','milk','vfeed','route','nfeed'].forEach(function(f){
+    var el=document.getElementById(f); if(el){el.oninput=recalc;el.onchange=recalc;}
+  });
+  applyGA(); recalc(); switchPage(1);
+}
+init();
+</script>
+</body>
+</html>
