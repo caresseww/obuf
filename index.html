@@ -300,7 +300,7 @@
       <label class="fld"><span class="lab">日龄 DOL</span><input class="inp mono" id="dol" inputmode="numeric" placeholder="18"></label>
     </div>
     <div class="grid c3" style="margin-top:10px;">
-      <label class="fld"><span class="lab">奶方</span><select class="inp" id="milk"></select></label>
+      <label class="fld"><span class="lab">奶方 <span class="hint">括号内=2026.1后新名</span></span><select class="inp" id="milk"></select></label>
       <label class="fld"><span class="lab">每顿奶量 <span class="hint">ml/顿</span></span><input class="inp mono" id="vfeed" inputmode="decimal" placeholder="如 21"></label>
       <label class="fld"><span class="lab">每天顿数</span><select class="inp" id="nfeed">
         <option>12</option><option>10</option><option>9</option><option selected>8</option><option>7</option><option>6</option><option>5</option><option>4</option>
@@ -455,6 +455,29 @@
 <script>
 /* ==================== 数据（冻结自2026-09-27导出 · 完全离线） ==================== */
 const MILK = {"母乳": {"energy": 67, "protein": 1.4, "carb": 6.7, "fat": 3.9, "na": 25, "k": 57, "ca": 25, "p": 13, "fe": 0.12, "zn": 0.34, "vitA": 390, "vitD": 2, "osm": 280}, "母乳+1/4雀巢": {"energy": 71.35, "protein": 1.76, "carb": 7.02, "fat": 4.08, "na": 34.18, "k": 69.1, "ca": 43.9, "p": 24, "fe": 0.57, "zn": 0.58, "vitA": 667, "vitD": 37.2, "osm": 294.75}, "母乳+1/2雀巢": {"energy": 75.7, "protein": 2.12, "carb": 7.34, "fat": 4.26, "na": 43.36, "k": 81.2, "ca": 62.8, "p": 35, "fe": 1.02, "zn": 0.82, "vitA": 944, "vitD": 72.4, "osm": 309.5}, "母乳+3/4雀巢": {"energy": 80.05, "protein": 2.48, "carb": 7.66, "fat": 4.44, "na": 52.54, "k": 93.3, "ca": 81.7, "p": 46, "fe": 1.47, "zn": 1.06, "vitA": 1221, "vitD": 107.6, "osm": 324.25}, "母乳+4/4雀巢": {"energy": 84.4, "protein": 2.84, "carb": 7.98, "fat": 4.62, "na": 61.72, "k": 105.4, "ca": 100.6, "p": 57, "fe": 1.92, "zn": 1.3, "vitA": 1498, "vitD": 142.8, "osm": 339}, "母乳+5/4雀巢": {"energy": 88.75, "protein": 3.2, "carb": 8.3, "fat": 4.8, "na": 70.9, "k": 117.5, "ca": 119.5, "p": 68, "fe": 2.37, "zn": 1.54, "vitA": 1775, "vitD": 178, "osm": 353.75}, "母乳+1/5优博": {"energy": 70.9, "protein": 1.66, "carb": 7.29, "fat": 3.95, "na": 27, "k": 60, "ca": 40, "p": 21.5, "fe": 0.28, "zn": 0.41, "vitA": 597, "vitD": 30, "osm": 300}, "母乳+2/5优博": {"energy": 74.8, "protein": 1.92, "carb": 7.88, "fat": 4, "na": 29, "k": 63, "ca": 55, "p": 30, "fe": 0.44, "zn": 0.48, "vitA": 804, "vitD": 58, "osm": 320}, "母乳+3/5优博": {"energy": 78.7, "protein": 2.18, "carb": 8.47, "fat": 4.05, "na": 31, "k": 66, "ca": 70, "p": 38.5, "fe": 0.6, "zn": 0.55, "vitA": 1011, "vitD": 86, "osm": 340}, "母乳+4/5优博": {"energy": 82.6, "protein": 2.44, "carb": 9.06, "fat": 4.1, "na": 33, "k": 69, "ca": 85, "p": 47, "fe": 0.76, "zn": 0.62, "vitA": 1218, "vitD": 114, "osm": 360}, "母乳+5/5优博": {"energy": 86.5, "protein": 2.7, "carb": 9.65, "fat": 4.15, "na": 35, "k": 72, "ca": 100, "p": 55.5, "fe": 0.92, "zn": 0.69, "vitA": 1425, "vitD": 142, "osm": 380}, "蔼儿舒": {"energy": 68, "protein": 2.8, "carb": 7.5, "fat": 3.5, "na": 32, "k": 83, "ca": 68, "p": 46, "fe": 0.7, "zn": 0.7, "vitA": 200, "vitD": 50, "osm": 188}, "74蔼儿舒": {"energy": 74, "protein": 3.05, "carb": 8.16, "fat": 3.8, "na": 34.82, "k": 90.32, "ca": 74, "p": 50.06, "fe": 0.76, "zn": 0.76, "vitA": 218, "vitD": 54, "osm": 205}, "78蔼儿舒": {"energy": 78, "protein": 3.21, "carb": 8.6, "fat": 4, "na": 36.71, "k": 95.21, "ca": 78, "p": 52.76, "fe": 0.8, "zn": 0.8, "vitA": 229, "vitD": 57, "osm": 216}, "82蔼儿舒": {"energy": 82, "protein": 3.38, "carb": 9.04, "fat": 4.2, "na": 38.59, "k": 100.09, "ca": 82, "p": 55.47, "fe": 0.84, "zn": 0.84, "vitA": 241, "vitD": 60, "osm": 227}, "89蔼儿舒": {"energy": 89, "protein": 3.67, "carb": 9.82, "fat": 4.55, "na": 41.88, "k": 108.63, "ca": 89, "p": 60.21, "fe": 0.92, "zn": 0.92, "vitA": 262, "vitD": 65, "osm": 246}, "100蔼儿舒": {"energy": 100, "protein": 4.12, "carb": 11.03, "fat": 5.1, "na": 47.06, "k": 122.06, "ca": 100, "p": 67.65, "fe": 1.03, "zn": 1.03, "vitA": 294, "vitD": 74, "osm": 276}, "纽太特": {"energy": 67, "protein": 2.9, "carb": 7.05, "fat": 3.5, "na": 19.6, "k": 67.16, "ca": 50.37, "p": 35.59, "fe": 0.76, "zn": 0.5, "vitA": 200, "vitD": 50, "osm": 220}, "73纽太特": {"energy": 73, "protein": 3.16, "carb": 7.68, "fat": 3.8, "na": 21.36, "k": 73.17, "ca": 54.88, "p": 38.78, "fe": 0.83, "zn": 0.54, "vitA": 218, "vitD": 54, "osm": 240}, "77纽太特": {"energy": 77, "protein": 3.33, "carb": 8.1, "fat": 4, "na": 22.53, "k": 77.18, "ca": 57.89, "p": 40.9, "fe": 0.87, "zn": 0.57, "vitA": 230, "vitD": 57, "osm": 253}, "81纽太特": {"energy": 81, "protein": 3.5, "carb": 8.52, "fat": 4.2, "na": 23.7, "k": 81.19, "ca": 60.9, "p": 43.02, "fe": 0.92, "zn": 0.6, "vitA": 242, "vitD": 60, "osm": 266}, "88纽太特": {"energy": 88, "protein": 3.81, "carb": 9.26, "fat": 4.55, "na": 25.75, "k": 88.2, "ca": 66.17, "p": 46.73, "fe": 1, "zn": 0.65, "vitA": 263, "vitD": 65, "osm": 289}, "100纽太特": {"energy": 100, "protein": 4.33, "carb": 10.52, "fat": 5.1, "na": 29.25, "k": 100.23, "ca": 75.18, "p": 53.11, "fe": 1.13, "zn": 0.74, "vitA": 299, "vitD": 74, "osm": 328}, "纽康特": {"energy": 67, "protein": 2.9, "carb": 7, "fat": 3.5, "na": 28.3, "k": 79.4, "ca": 84.9, "p": 59.3, "fe": 1.1, "zn": 0.8, "vitA": 200, "vitD": 50, "osm": 360}, "纽荃星": {"energy": 100, "protein": 3.2, "carb": 9.9, "fat": 5.2, "na": 42, "k": 100, "ca": 101, "p": 57, "fe": 1, "zn": 0.9, "vitA": 300, "vitD": 75, "osm": 340}, "早产儿奶": {"energy": 80, "protein": 2.4, "carb": 8.6, "fat": 4.2, "na": 43.3, "k": 97.41, "ca": 122, "p": 72, "fe": 1.7, "zn": 1, "vitA": 733, "vitD": 124, "osm": 239}, "PDF奶": {"energy": 75, "protein": 2.2, "carb": 7.7, "fat": 3.8, "na": 34, "k": 92, "ca": 82, "p": 48, "fe": 1.37, "zn": 0.73, "vitA": 300, "vitD": 60, "osm": 312}};
+/* 奶方新名（2026.1后HIS标准名，据2026真实医嘱266条核验；母乳强化剂→母乳添加剂） */
+const MILK_NEW = {
+  '蔼儿舒':'婴儿深度水解奶A',
+  '74蔼儿舒':'婴儿深度水解奶74A',
+  '78蔼儿舒':'婴儿深度水解奶78A',
+  '82蔼儿舒':'婴儿深度水解奶82A',
+  '89蔼儿舒':'婴儿深度水解奶89A',
+  '100蔼儿舒':'婴儿深度水解奶100A',
+  '纽太特':'婴儿深度水解奶N',
+  '73纽太特':'婴儿深度水解奶73N',
+  '77纽太特':'婴儿深度水解奶77N',
+  '81纽太特':'婴儿深度水解奶81N',
+  '88纽太特':'婴儿深度水解奶88N',
+  '100纽太特':'婴儿深度水解奶100N',
+  '纽康特':'婴儿氨基酸奶N',
+  '纽荃星':'婴儿高热卡整蛋白奶',
+  'PDF奶':'PDF奶M',
+  '母乳+1/4雀巢':'母乳添加剂1包/100ml',
+  '母乳+1/2雀巢':'母乳添加剂2包/100ml',
+  '母乳+3/4雀巢':'母乳添加剂3包/100ml',
+  '母乳+4/4雀巢':'母乳添加剂4包/100ml',
+  '母乳+5/4雀巢':'母乳添加剂5包/100ml'
+};
 /* 100条真实医嘱审核（2026标注医嘱227条分层抽样100条反推目标值） */
 const AUDIT = {"rows": [{"nm": "铁", "n": 93, "p25": 4.1, "p50": 5.1, "p75": 5.8, "def": "2.5(预防)/5(治疗)", "ok": true}, {"nm": "锌", "n": 61, "p25": 2.9, "p50": 3.1, "p75": 3.3, "def": "3(早产)", "ok": true}, {"nm": "钙", "n": 12, "p25": 124.2, "p50": 152.5, "p75": 170.1, "def": "150(早产)", "ok": true}, {"nm": "磷", "n": 11, "p25": 95.2, "p50": 100.3, "p75": 100.3, "def": "100(早产)", "ok": true}, {"nm": "钠", "n": 47, "p25": 4.8, "p50": 5.4, "p75": 8.2, "def": "5(早产)", "ok": true}, {"nm": "钾", "n": 3, "p25": 3.65, "p50": 3.7, "p75": 4.5, "def": "2.5(手册口径)", "ok": false}]};
 
@@ -851,7 +874,12 @@ function slotClearTap(){var db=slotsDB();delete db[curSlot];slotsSave(db);
 /* ==================== 初始化 ==================== */
 function init(){
   var sel=document.getElementById('milk');
-  Object.keys(MILK).forEach(function(k){var o=document.createElement('option');o.textContent=k;sel.appendChild(o);});
+  Object.keys(MILK).forEach(function(k){
+    var o=document.createElement('option');
+    o.textContent = MILK_NEW[k] ? (k+'（'+MILK_NEW[k]+'）') : k;
+    o.value = k;
+    sel.appendChild(o);
+  });
   sel.value='母乳+4/4雀巢';
   SUPPS.forEach(function(s){s.on=!s.off;});
   renderSupps(); renderAudit(); renderSlotChips();
