@@ -334,7 +334,7 @@
       <b>第3步</b>：查了血再微调目标格（改完药量自动重算）：<br>
       · <b>血磷</b> 低（&lt;1.8mmol/L，尤其AKP&gt;600=代谢性骨病预警）→ 磷目标往100~120上调，同步核对钙；手册正常2–2.7<br>
       · <b>血钙</b> 低 → 急性症状先静脉葡萄糖酸钙；维持期钙目标往150~170上调，查25-OH-D<br>
-      · <b>血钠</b> 低 → 钠目标往手册上限5靠或短期超（限早产生后3天内谨慎）；高 → 下调<br>
+      · <b>血钠</b> 低 → 先用下方「补缺计算」定量（手册0.7系数），维持量仍按钠行；高 → 下调<br>
       · <b>Hb↓/铁蛋白低</b> → 点铁行「治疗5」快切（手册治疗量4–6），2周后复盘血常规<br>
       · <b>25-OH-D</b> 不足 → VD改800~1000<br>
       · <b>血镁</b> 低（手册0.8–1.0为正常）→ 开镁行<br>
@@ -342,6 +342,15 @@
     </div>
   </details>
   <div id="supps"></div>
+  <details class="note"><summary style="color:var(--teal);font-weight:600;">🩸 已查出血钠低？补缺计算（手册0.7系数）</summary>
+    <div class="grid c3" style="gap:8px;margin-top:8px;">
+      <label class="fld"><span class="lab">实测血钠 mmol/L</span><input class="inp mono" id="naLow" inputmode="decimal" placeholder="如 128"></label>
+      <label class="fld"><span class="lab">目标血钠 mmol/L</span><input class="inp mono" id="naLowTgt" inputmode="decimal" value="135"></label>
+      <div style="align-self:end;"><span class="dotbtn" onclick="document.getElementById('naLow').value='';naLowCalc();recalc()">清除</span></div>
+    </div>
+    <div class="ion-calc" id="naLowOut" style="display:none;"></div>
+    <div class="hint" style="margin-top:4px;">缺钠mmol=(目标−实测)×0.7×体重(kg)，手册第六版0.7系数；10%NaCl 1ml=1.7mmol、3%NaCl 1ml=0.513mmol。填了实测值会自动在页4医嘱追加一条补缺行；其余元素（钙磷锌铁）无补缺公式——做法=目标调到上限+1~2周复查生化。</div>
+  </details>
   <div id="warn"></div>
 
   <div class="copy-row">
@@ -721,6 +730,9 @@ function orderText(){
     var dose = r.name.indexOf('维生素')===0? r.ml : r.ml+'(ml)';
     lines.push((i+1)+'. '+r.name+' '+dose+' '+r.route+' '+r.fq+(r.remark?' '+r.remark:''));
   });
+  if(window.__naLow&&window.__naLow.mmol>0){
+    lines.push((R.rows.length+1)+'. 另: 补缺钠'+f2(window.__naLow.mmol)+'mmol=10%NaCl '+f2(window.__naLow.ml10)+'(ml) 分次入奶(手册0.7系数,复查后调整)');
+  }
   lines.push('——目标=2026真实医嘱校准·写法=2026真实口径·上级审核后录入——');
   return lines.join('\n');
 }
@@ -776,6 +788,21 @@ function renderFeed(c){
   }
 }
 
+function naLowCalc(){
+  var na=num(g('naLow')), tgt=num(g('naLowTgt'))||135, W=num(g('wt'))||0;
+  var out=document.getElementById('naLowOut');
+  if(!(na>0)&&!(tgt>0)){out.style.display='none';window.__naLow=null;return;}
+  var def=(tgt-na)*0.7*W;
+  if(!(def>0)){out.style.display='block';
+    out.innerHTML='实测'+(na||'—')+' ≥ 目标'+tgt+'：无补缺需要（维持量按钠行即可）';
+    window.__naLow=null;return;}
+  var mmol=def, ml10=mmol/1.7, ml3=mmol/0.513;
+  window.__naLow={mmol:mmol,ml10:ml10};
+  out.style.display='block';
+  out.innerHTML='缺钠 <b>'+f2(mmol)+'</b> mmol（=(目标'+tgt+'−实测'+na+')×0.7×'+W+'kg）<br>'+
+    '→ 10%NaCl <b>'+f2(ml10)+'</b> ml/d 入奶（可按钠行频次分次）　｜　3%NaCl '+f2(ml3)+' ml（静脉慢滴需稀释，症状性才用）'+
+    '<br><span style="color:var(--ink3)">补充期间每8-12h复查血钠，达目标即停补缺、回归维持量</span>';
+}
 function recalc(){
   var c=calc();
   renderMilk(c); renderRows(c); renderFeed(c); renderOrderCard();
@@ -905,6 +932,7 @@ function init(){
   ['bed','pname','wt','ga','gad','dol','milk','vfeed','route','nfeed'].forEach(function(f){
     var el=document.getElementById(f); if(el){el.oninput=recalc;el.onchange=recalc;}
   });
+  ['naLow','naLowTgt'].forEach(function(f){var el=document.getElementById(f);if(el){el.oninput=naLowCalc;el.onchange=naLowCalc;}});
   applyGA(); recalc(); switchPage(1);
 }
 init();
