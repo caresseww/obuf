@@ -333,7 +333,7 @@
 
   <details class="note" open style="margin-top:10px;"><summary style="color:var(--teal);font-weight:600;">🎯 要补多少？三步定目标（点开看查血后怎么调）</summary>
     <div class="hint" style="margin-top:6px;">
-      <b>第1步</b>：目标格默认已按胎龄自动填好（早产/足月两套，2026真实医嘱校准）——大多数时候不用改。<br>
+      <b>第1步</b>：目标格默认已按胎龄自动填好（早产/足月两套，口径见本页顶部开关：<b>速查/手册口径</b>=钙130·磷75·铁3·锌1.5·钠4；<b>2026实际口径</b>=钙150·磷100·铁2.5·锌3·钠5）——大多数时候不用改。<br>
       <b>第2步</b>：填好页1奶方后，每行自动显示「总X=奶X+药X」——奶够的会标✓无需补，缺口自动折成ml/次。<br>
       <b>第3步</b>：查了血再微调目标格（改完药量自动重算）：<br>
       · <b>血磷</b> 低（&lt;1.8mmol/L，尤其AKP&gt;600=代谢性骨病预警）→ 磷目标往100~120上调，同步核对钙；手册正常2–2.7<br>
@@ -401,7 +401,7 @@
       <thead><tr><th style="width:42%;">医嘱</th><th style="width:26%;">剂量 / 途径·频次</th><th>备注（总量拆分/渗透压）</th></tr></thead>
       <tbody id="ordRows"></tbody>
     </table>
-    <div class="foot-line">目标=2026真实医嘱校准（100条审核）· 写法=2026真实口径 · 须经上级医师审核后录入</div>
+    <div class="foot-line" id="ordFoot">目标口径=速查/手册 · 写法=2026真实口径 · 须经上级医师审核后录入</div>
   </div>
   <input type="hidden" id="copyMode" value="simple">
   <details class="ref"><summary>📄 复制文本预览（按所选模式实时更新）</summary>
@@ -433,11 +433,11 @@
 
   <details class="ref"><summary>✅ 100条真实医嘱审核（2026-01~05 · 目标值校准依据）</summary>
     <div class="ref-body">
-      <div class="ref-tip">方法：2026年带「总X=奶X+药X」总量标注的真实医嘱共227条，分层抽样100条回测本台——用真实标注反推本科室实际使用的目标值，与本台默认对照：</div>
+      <div class="ref-tip">方法：2026年带「总X=奶X+药X」总量标注的真实医嘱共227条，分层抽样100条回测本台——用真实标注反推本科室实际使用的目标值（=页2「2026实际口径」的来源），与指南口径对照：</div>
       <div class="tscroll"><table id="auditTbl"></table></div>
       <ul>
-        <li><b>铁</b>：标注医嘱集中在治疗量档（P50 5.1，即贫血治疗4–6）——本台默认预防2.5，铁行提供「预防2.5 / 治疗5」快切；</li>
-        <li><b>锌 3.1 · 钙 152 · 磷 100 · 钠 5.4</b>：本台默认已按2026实际P50校准（手册区间为对照，速查工具的锌1–2口径偏低）；</li>
+        <li><b>铁</b>：标注医嘱集中在治疗量档（P50 5.1，即贫血治疗4–6）——2026口径预防2.5；铁行提供「预防/治疗5」快切（预防值随口径变）；</li>
+        <li><b>锌 3.1 · 钙 152 · 磷 100 · 钠 5.4</b>：=「2026实际口径」的值（页2可切换）。默认口径为速查/手册；营养科Excel自带例子的合计（钙≈150/铁≈4.9/钠≈5.6）与这些值一致——是本院实践，不是指南；</li>
         <li><b>钾</b>：标注仅3条（奶可覆盖大半），维持手册口径；</li>
         <li>浓度换算（铁3/锌3/钙50mg/ml、瑞安吉磷15.5mg+钠0.75mmol/ml）已与2026「总X=奶+药」标注逐条反推核验一致。</li>
       </ul>
@@ -728,7 +728,7 @@ function renderRows(c){
     else if(c.worst.osm>=410) warns.push('渗透压估算：最高一顿 '+Math.round(c.worst.osm*10)/10+'（'+c.worst.drugs+'顿），接近450红线，调量后复测');
   }
   document.getElementById('warn').innerHTML = warns.length? '<div class="warnbox">⚠️ '+warns.join('；')+'</div>' :
-    '<div class="okbox">✓ 目标按胎龄'+(isPreterm()?'<37周(早产)':'≥37周(足月)')+'默认（2026真实医嘱校准）；核对后到页3看每顿明细、页4抄医嘱</div>';
+    '<div class="okbox">✓ 目标按胎龄'+(isPreterm()?'<37周(早产)':'≥37周(足月)')+'·'+(TGT_MODE==='practice2026'?'2026实际口径':'速查/手册口径')+'默认；查血后直接改目标格即可重算</div>';
 }
 
 /* ==================== 医嘱数据行（文本+表格共用） ==================== */
@@ -794,13 +794,15 @@ function orderText(){
   if(window.__naLow&&window.__naLow.mmol>0){
     lines.push((R.rows.length+1)+'. 另: 补缺钠'+f2(window.__naLow.mmol)+'mmol=10%NaCl '+f2(window.__naLow.ml10)+'(ml) 分次入奶(手册0.7系数,复查后调整)');
   }
-  lines.push('——目标=2026真实医嘱校准·写法=2026真实口径·上级审核后录入——');
+  lines.push('——目标='+(TGT_MODE==='practice2026'?'2026实际口径(P50)':'速查/手册口径')+'·写法=2026真实口径·上级审核后录入——');
   return lines.join('\n');
 }
 /* 正式医嘱单表格渲染 */
 function renderOrderCard(){
   var R=orderRows(), c=R.c;
   document.getElementById('ordSub').textContent='床号 '+(g('bed')||'__')+' · '+(g('pname')||'__')+' · '+new Date().toLocaleDateString('zh-CN');
+  var foot=document.getElementById('ordFoot');
+  if(foot) foot.textContent='目标口径='+(TGT_MODE==='practice2026'?'2026实际(P50)':'速查/手册')+' · 写法=2026真实口径 · 须经上级医师审核后录入';
   document.getElementById('ordFeedKv').innerHTML=
     '<span class="kv-item"><span class="k">体重</span> <span class="v">'+(g('wt')||'__')+'kg</span></span>'+
     '<span class="kv-item"><span class="k">胎龄</span> <span class="v">'+(g('ga')||'__')+'+'+num(g('gad'))+'d</span></span>'+
@@ -933,9 +935,9 @@ function resetAll(){
 
 /* ==================== 审核表 ==================== */
 function renderAudit(){
-  var rows='<tr><th>元素</th><th class="num">标注n</th><th class="num">P25</th><th class="num">P50</th><th class="num">P75</th><th class="num">本台默认</th><th>校准</th></tr>';
+  var rows='<tr><th>元素</th><th class="num">标注n</th><th class="num">P25</th><th class="num">P50</th><th class="num">P75</th><th class="num">2026口径值</th><th>来源</th></tr>';
   AUDIT.rows.forEach(function(r){
-    rows+='<tr><td class="l">'+r.nm+'</td><td class="num">'+r.n+'</td><td class="num">'+r.p25+'</td><td class="num">'+r.p50+'</td><td class="num">'+r.p75+'</td><td class="num">'+r.def+'</td><td class="l">'+(r.ok?'✓ 默认=P50':'—')+'</td></tr>';
+    rows+='<tr><td class="l">'+r.nm+'</td><td class="num">'+r.n+'</td><td class="num">'+r.p25+'</td><td class="num">'+r.p50+'</td><td class="num">'+r.p75+'</td><td class="num">'+r.def+'</td><td class="l">'+(r.ok?'✓ =P50':'—')+'</td></tr>';
   });
   document.getElementById('auditTbl').innerHTML=rows;
 }
@@ -980,7 +982,7 @@ function exportImg(){
     ctx.fillText(t,pad,y); y+=26;
   });
   y+=10; ctx.font='11px -apple-system,PingFang SC,sans-serif';ctx.fillStyle='#555';
-  ctx.fillText('目标=2026真实医嘱校准(100条审核) · 须经上级医师审核 · '+new Date().toLocaleString('zh-CN'),pad,H-16);
+  ctx.fillText('目标口径='+(TGT_MODE==='practice2026'?'2026实际(P50)':'速查/手册')+' · 须经上级医师审核 · '+new Date().toLocaleString('zh-CN'),pad,H-16);
   cv.toBlob(function(blob){
     var url=URL.createObjectURL(blob);
     var a=document.createElement('a');a.href=url;
