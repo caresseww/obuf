@@ -326,7 +326,10 @@
 <!-- ===== 页2 补剂开单 ===== -->
 <section class="card page" id="s2">
   <div class="card-head"><span class="step-no">页 2</span><h2>补剂开单</h2></div>
-  <p class="card-sub">目标默认值=2026真实医嘱P50校准（见页4审核表）· 总量含奶 · 按差额补 · <span class="dotbtn" onclick="applyGA()">按胎龄重置目标值</span></p>
+  <p class="card-sub">总量含奶 · 按差额补 · <span class="dotbtn" onclick="applyGA()">按胎龄重置目标值</span><br>
+  目标口径：<span class="dotbtn" id="tmode_guideline" onclick="setTgtMode('guideline')">速查/手册口径</span>
+  <span class="dotbtn" id="tmode_practice2026" onclick="setTgtMode('practice2026')">2026实际口径</span>
+  <span class="hint">速查/手册=指南推荐；2026实际=本院医嘱P50(部分元素高于指南，见页4对照)</span></p>
 
   <details class="note" open style="margin-top:10px;"><summary style="color:var(--teal);font-weight:600;">🎯 要补多少？三步定目标（点开看查血后怎么调）</summary>
     <div class="hint" style="margin-top:6px;">
@@ -465,16 +468,17 @@
 
   <details class="ref"><summary>📏 手册第六版目标对照 + 红线提醒</summary>
     <div class="ref-body">
-      <div class="tscroll"><table>
-        <tr><th>成分</th><th class="num">早产儿(手册)</th><th class="num">足月儿(手册)</th><th class="num">本台默认(2026校准)</th></tr>
-        <tr><td class="l">钙 mg/kg/d</td><td class="num">120–140</td><td class="num">60–80</td><td class="num">150 / 70</td></tr>
-        <tr><td class="l">磷 mg/kg/d</td><td class="num">60–90</td><td class="num">30–40</td><td class="num">100 / 35</td></tr>
-        <tr><td class="l">铁 mg/kg/d</td><td class="num">2–3（治疗4–6）</td><td class="num">1</td><td class="num">2.5（治疗快切5）</td></tr>
-        <tr><td class="l">锌 mg/kg/d</td><td class="num">1–2</td><td class="num">0.5–1</td><td class="num">3 / 1.5</td></tr>
-        <tr><td class="l">钠 mmol/kg/d</td><td class="num">3–5</td><td class="num">2–3</td><td class="num">5 / 2.5</td></tr>
-        <tr><td class="l">钾 mmol/kg/d</td><td class="num" colspan="2">2–3</td><td class="num">2.5</td></tr>
-        <tr><td class="l">维生素D iu/d</td><td class="num">800–1000（1–2周起）</td><td class="num">400</td><td class="num">800 / 400</td></tr>
+<div class="tscroll"><table>
+        <tr><th>成分</th><th class="num">手册第六版</th><th class="num">速查工具</th><th class="num">2026实际</th><th>说明</th></tr>
+        <tr><td class="l">钙 mg/kg/d</td><td class="num">120–140（p24-25肠内·早产）</td><td class="num">130 / 70</td><td class="num">≈152（早产标注P50）</td><td>手册未载足月肠内值</td></tr>
+        <tr><td class="l">磷 mg/kg/d</td><td class="num">60–90（p24-25·早产）</td><td class="num">75 / 35</td><td class="num">≈100</td><td>同上</td></tr>
+        <tr><td class="l">铁 mg/kg/d</td><td class="num">2–3（治疗4–6）p25</td><td class="num">3 / 1</td><td class="num">治疗档≈5.1</td><td>手册p25；2026标注全是治疗档</td></tr>
+        <tr><td class="l">锌 mg/kg/d</td><td class="num">手册未载补剂剂量（仅p29查血锌指征）</td><td class="num">1.5 / 0.75</td><td class="num">≈3.1</td><td>速查1–2为推荐；本院实际用得更多</td></tr>
+        <tr><td class="l">钠 mmol/kg/d</td><td class="num">3–5 / 2–3（p27·静脉口径）</td><td class="num">4 / 2.5</td><td class="num">≈5.4</td><td>肠内参考借用p27</td></tr>
+        <tr><td class="l">钾 mmol/kg/d</td><td class="num">1–2（p27·静脉口径）</td><td class="num">2.5</td><td class="num">奶已≈2.4</td><td>肠内奶钾本身高，速查取2.5为总量参考</td></tr>
+        <tr><td class="l">维生素D iu/d</td><td class="num">800–1000（1–2周起）p25</td><td class="num">速查未单列</td><td class="num">400主流/早产800</td><td>伊可新含VD500</td></tr>
       </table></div>
+      <div class="ref-tip">目标口径在页2可切换：<b>速查/手册口径</b>（默认，页2目标格按此填）与<b>2026实际口径</b>（本院医嘱P50，铁锌钠钙磷普遍高于指南——是本院实践不是指南）。2026值来源=227条带「总X=奶X+药X」标注医嘱，与你营养科Excel自带例子的合计一致（该例钙合计≈150、铁≈4.9、钠≈5.6）——故2026口径并非杜撰，但它是实践值，是否采用由你决定。</div>
       <div class="ref-tip">⚠️ 红线：①地高辛用药期间禁止补钙；②见尿补钾、监测血钾心电图；③瑞安吉含钠0.75mmol/ml计入总钠；④混合奶渗透压≤450 mOsm/L；⑤铁剂足量前查铁蛋白/Hb，治疗量4–6须复盘血常规；⑥低钙抽搐急性期先静脉葡萄糖酸钙，口服补钙为维持/缺口补充。</div>
     </div>
   </details>
@@ -547,24 +551,26 @@ const OSM_ML = {ca:7.82, fe:3.5, zn:3.404, na:3.4, k:4.0, mg2:8.32};/* 瑞安吉
 const FREQN = {'qd':1,'qod':0.5,'bid':2,'tid':3,'qid':4,'q6h':4,'q8h':3,'q12h':2,'q4h':6,'q3h':8,'q2h':12};
 
 /* 补剂定义：tgt=[早产,足月]默认（2026真实P50校准） */
+/* 口径: guideline=速查/手册(默认) practice2026=2026实际校准 */
+var TGT_MODE='guideline';
 const SUPPS = [
-  {key:'ca', nm:'钙', tgt:[150,70], unit:'mg/kg/d', rng:'手册120–140/60–80 · 2026实际≈152', fq:'q8h', fqs:['q8h','tid','bid','q12h','qd','q4h'],
+  {key:'ca', nm:'钙', tgt:[150,70], alt:[130,70], unit:'mg/kg/d', rng:'手册120–140/60–80 · 2026实际≈152', fq:'q8h', fqs:['q8h','tid','bid','q12h','qd','q4h'],
    note:'2026实际：奶为主+小额补差（强化奶常已达标，药仅补缺口）'},
-  {key:'phos', nm:'磷', tgt:[100,35], unit:'mg/kg/d', rng:'手册60–90/30–40 · 2026实际≈100', fq:'bid', fqs:['bid','q8h','tid','q6h','qd'],
+  {key:'phos', nm:'磷', tgt:[100,35], alt:[75,35], unit:'mg/kg/d', rng:'手册60–90/30–40 · 2026实际≈100', fq:'bid', fqs:['bid','q8h','tid','q6h','qd'],
    note:'瑞安吉1ml=磷15.5mg+钠0.75mmol，钠自动计入总钠'},
-  {key:'fe', nm:'铁', tgt:[2.5,2.5], unit:'mg/kg/d', rng:'预防2–3 · 治疗4–6 · 2026治疗档≈5.1', fq:'bid', fqs:['bid','q6h','tid','q8h','q12h','qd'],
+  {key:'fe', nm:'铁', tgt:[2.5,2.5], alt:[3,1], unit:'mg/kg/d', rng:'预防2–3 · 治疗4–6 · 2026治疗档≈5.1', fq:'bid', fqs:['bid','q6h','tid','q8h','q12h','qd'],
    quick:true, note:'生后2–4周起补；贫血时点「治疗5」快切。⚠️浓度:2026医嘱备注反推中位6.2(P25-75=6.05-6.42),与营养科Excel铁B=6.5吻合,默认铁B;用艾尔铁原液时选3mg/ml'},
-  {key:'zn', nm:'锌', tgt:[3,1.5], unit:'mg/kg/d', rng:'速查1–2 · 2026实际≈3.1', fq:'bid', fqs:['bid','qd','q12h','tid','q8h','q6h'],
+  {key:'zn', nm:'锌', tgt:[3,1.5], alt:[1.5,0.75], unit:'mg/kg/d', rng:'速查1–2 · 2026实际≈3.1', fq:'bid', fqs:['bid','qd','q12h','tid','q8h','q6h'],
    note:'2026备注79%按贝蒂喜锌4.5mg/ml反推、12%按艾尔锌3mg/ml——默认贝蒂喜4.5,用艾尔锌时手动切换'},
-  {key:'na', nm:'钠', tgt:[5,2.5], unit:'mmol/kg/d', rng:'手册3–5/2–3 · 2026实际≈5.4', fq:'q6h', fqs:['q6h','q8h','q12h','qd','bid','q4h'],
+  {key:'na', nm:'钠', tgt:[5,2.5], alt:[4,2.5], unit:'mmol/kg/d', rng:'手册3–5/2–3 · 2026实际≈5.4', fq:'q6h', fqs:['q6h','q8h','q12h','qd','bid','q4h'],
    mmol:true, note:'总量含奶钠与瑞安吉钠；超未成熟儿生后3天内谨慎'},
-  {key:'k', nm:'钾', tgt:[2.5,2.5], unit:'mmol/kg/d', rng:'手册2–3', fq:'bid', fqs:['bid','qd','tid','q4h','q8h'],
+  {key:'k', nm:'钾', tgt:[2.5,2.5], alt:[2.5,2.5], unit:'mmol/kg/d', rng:'手册2–3', fq:'bid', fqs:['bid','qd','tid','q4h','q8h'],
    mmol:true, note:'见尿补钾；总量含奶钾（奶常可覆盖大半）'},
-  {key:'vd', nm:'维生素D', tgt:[800,400], unit:'iu/d', rng:'手册 早产800–1000(1–2周起)/足月400', fq:'qd', fqs:['qd'],
+  {key:'vd', nm:'维生素D', tgt:[800,400], alt:[800,400], unit:'iu/d', rng:'手册 早产800–1000(1–2周起)/足月400', fq:'qd', fqs:['qd'],
    fixed:true, note:'2026实际：400iu为主、早产800iu；与伊可新常二选一'},
-  {key:'ad', nm:'伊可新AD', tgt:[500,500], unit:'iu/d', rng:'2026主流 500/1000', fq:'qd', fqs:['qd'],
+  {key:'ad', nm:'伊可新AD', tgt:[500,500], alt:[500,500], unit:'iu/d', rng:'2026主流 500/1000', fq:'qd', fqs:['qd'],
    fixed:true, note:'含维生素A；与VD滴剂常二选一，两开时注意总量'},
-  {key:'mg2', nm:'镁', tgt:[7.5,4], unit:'mg/kg/d', rng:'速查 5–10/3–5', fq:'bid', fqs:['bid','qd'],
+  {key:'mg2', nm:'镁', tgt:[7.5,4], alt:[7.5,4], unit:'mg/kg/d', rng:'速查 5–10/3–5', fq:'bid', fqs:['bid','qd'],
    off:true, note:'2026未检出医嘱，按需开启'}
 ];
 
@@ -576,6 +582,7 @@ function r05(x){return Math.max(0.05,Math.round(x*20)/20);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);}
 function isPreterm(){return num(g('ga'))+num(g('gad'))/7<37;}
+function tgtFor(s){var base=(TGT_MODE==='practice2026')?s.tgt:(s.alt||s.tgt);return base[isPreterm()?0:1];}
 
 /* ==================== 翻页 ==================== */
 function switchPage(n){
@@ -599,8 +606,8 @@ function renderSupps(){
       ? '<label class="fld"><span class="lab">剂量 ('+s.unit+')</span><select class="inp" id="t_'+s.key+'">'+
         (s.key==='vd'?'<option>400</option><option>800</option><option>1000</option>':'<option>500</option><option>1000</option>')+
         '</select></label>'
-      : '<label class="fld"><span class="lab">目标总量 '+s.unit+'</span><input class="inp mono" id="t_'+s.key+'" inputmode="decimal" value="'+s.tgt[isPreterm()?0:1]+'"></label>';
-    var quick = s.quick? '<span class="dotbtn" onclick="setTgt(\'fe\',2.5)">预防2.5</span><span class="dotbtn" onclick="setTgt(\'fe\',5)">治疗5</span>' : '';
+      : '<label class="fld"><span class="lab">目标总量 '+s.unit+'</span><input class="inp mono" id="t_'+s.key+'" inputmode="decimal" value="'+tgtFor(s)+'"></label>';
+    var quick = s.quick? '<span class="dotbtn" onclick="setTgt(\'fe\','+(TGT_MODE==='practice2026'?2.5:3)+')">预防'+(TGT_MODE==='practice2026'?2.5:3)+'</span><span class="dotbtn" onclick="setTgt(\'fe\',5)">治疗5</span>' : '';
     d.innerHTML =
       '<div class="tile-head"><div class="ion-name"><div class="switch'+(s.on?' on':'')+'" onclick="tg(\''+s.key+'\')"></div>'+s.nm+
       '<span class="tag range">'+s.rng+'</span>'+(quick?'<span>'+quick+'</span>':'')+
@@ -902,9 +909,18 @@ function copyOrder(){
 function applyGA(){
   var pt=isPreterm();
   SUPPS.forEach(function(s){ if(s.fixed)return;
-    var el=document.getElementById('t_'+s.key); if(el) el.value=s.tgt[pt?0:1]; });
+    var el=document.getElementById('t_'+s.key); if(el) el.value=tgtFor(s); });
   var vd=document.getElementById('t_vd'); if(vd) vd.value=pt?'800':'400';
-  recalc(); toast('已按'+(pt?'早产':'足月')+'目标重置');
+  recalc(); toast('已按'+(pt?'早产':'足月')+'·'+(TGT_MODE==='practice2026'?'2026实际':'速查/手册')+'口径重置');
+}
+function setTgtMode(m){
+  TGT_MODE=m;
+  try{localStorage.setItem('oralSuppTgtMode',m);}catch(e){}
+  ['guideline','practice2026'].forEach(function(x){
+    var el=document.getElementById('tmode_'+x);
+    if(el){el.style.background=x===m?'var(--teal)':'';el.style.color=x===m?'#fff':'';}
+  });
+  renderSupps(); applyGA();
 }
 function loadExample(){
   slotApply({bed:'12',pname:'示范',wt:'1.50',ga:'30',gad:'5',dol:'20',milk:'母乳',vfeed:'21',route:'鼻饲',nfeed:'8'});
@@ -1012,6 +1028,7 @@ function slotClearTap(){var db=slotsDB();delete db[curSlot];slotsSave(db);
 
 /* ==================== 初始化 ==================== */
 function init(){
+  try{TGT_MODE=localStorage.getItem('oralSuppTgtMode')||'guideline';}catch(e){}
   var sel=document.getElementById('milk');
   Object.keys(MILK).forEach(function(k){
     var o=document.createElement('option');
@@ -1021,7 +1038,12 @@ function init(){
   });
   sel.value='母乳+4/4雀巢';
   SUPPS.forEach(function(s){s.on=!s.off;});
-  renderSupps(); renderAudit(); renderSlotChips();
+  renderSupps();
+  ['guideline','practice2026'].forEach(function(x){
+    var el=document.getElementById('tmode_'+x);
+    if(el){el.style.background=x===TGT_MODE?'var(--teal)':'';el.style.color=x===TGT_MODE?'#fff':'';}
+  });
+  renderAudit(); renderSlotChips();
   var db=slotsDB();
   var firstRun=!db[0];
   if(db[0]) slotApply(db[0]);
