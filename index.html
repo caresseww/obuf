@@ -399,7 +399,18 @@
     </table>
     <div class="foot-line">目标=2026真实医嘱校准（100条审核）· 写法=2026真实口径 · 须经上级医师审核后录入</div>
   </div>
+  <input type="hidden" id="copyMode" value="simple">
+  <details class="ref"><summary>📄 复制文本预览（按所选模式实时更新）</summary>
+    <div class="ref-body"><pre id="orderPreview" style="font-family:var(--mono);font-size:12px;white-space:pre-wrap;word-break:break-all;margin:0;line-height:1.8;"></pre></div>
+  </details>
 
+  <div class="copy-row" style="align-items:center;">
+    <span style="font-size:11.5px;color:var(--ink2);">文本模式</span>
+    <span class="dotbtn" id="mode_simple" onclick="setMode('simple')">精简</span>
+    <span class="dotbtn" id="mode_full" onclick="setMode('full')">完整</span>
+    <span class="dotbtn" id="mode_ledger" onclick="setMode('ledger')">带账</span>
+    <span class="hint" id="modeHint"></span>
+  </div>
   <div class="copy-row">
     <button class="btn primary" onclick="copyOrder()">复制医嘱文本</button>
     <button class="btn warn" onclick="exportImg()">生成黑白长图</button>
@@ -721,15 +732,26 @@ function orderRows(){
   if(c.out.ad) add(prodOf('ad').ord,num(g('t_ad'))+'(iu)','口服','qd','');
   return {c:c, route:route, rows:rows};
 }
-/* 纯文本（复制/长图用） */
+/* 纯文本（复制/长图用）——三种模式: 精简(默认)/完整/带账双行 */
 function orderText(){
   var R=orderRows(), c=R.c;
+  var mode=g('copyMode')||'simple';
   var lines=[];
-  lines.push('床号'+(g('bed')||'__')+' '+(g('pname')||'__')+' W'+(g('wt')||'__')+'kg 胎龄'+(g('ga')||'__')+'+'+(num(g('gad')))+'d DOL'+(g('dol')||'__')+'d '+
-    g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿('+f2(c.mi.v)+'ml/kg/d) q'+(24/c.nf).toFixed(0)+'h '+R.route);
+  var feedHead='床号'+(g('bed')||'__')+' '+(g('pname')||'__')+' W'+(g('wt')||'__')+'kg 胎龄'+(g('ga')||'__')+'+'+(num(g('gad')))+'d DOL'+(g('dol')||'__')+'d '+
+    g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿('+f2(c.mi.v)+'ml/kg/d) q'+(24/c.nf).toFixed(0)+'h '+R.route;
+  if(mode==='full'||mode==='ledger') lines.push(feedHead);
   R.rows.forEach(function(r,i){
-    var dose = r.name.indexOf('维生素')===0? r.ml : r.ml+'(ml)';
-    lines.push((i+1)+'. '+r.name+' '+dose+' '+r.route+' '+r.fq+(r.remark?' '+r.remark:''));
+    var isVit = r.name.indexOf('维生素')===0;
+    var dose = isVit? r.ml : r.ml+'(ml)';
+    var route = isVit? '口服' : r.route;
+    var lead = (mode==='full') ? ((i+1)+'. ') : '';
+    if(mode!=='ledger'){
+      lines.push(lead+r.name+' '+dose+' '+route+' '+r.fq+(r.remark&&mode==='full'? ' '+r.remark:''));
+    }else{
+      var main=r.name+' '+dose+' '+route+' '+r.fq+(r.remark?' '+r.remark.split(',渗透压')[0]:'');
+      var osm=(r.remark.match(/渗透压([\d.]+)/)||[])[1];
+      lines.push(main+(osm? '，渗透压'+osm:''));
+    }
   });
   if(window.__naLow&&window.__naLow.mmol>0){
     lines.push((R.rows.length+1)+'. 另: 补缺钠'+f2(window.__naLow.mmol)+'mmol=10%NaCl '+f2(window.__naLow.ml10)+'(ml) 分次入奶(手册0.7系数,复查后调整)');
@@ -804,9 +826,22 @@ function naLowCalc(){
     '→ 10%NaCl <b>'+f2(ml10)+'</b> ml/d 入奶（可按钠行频次分次）　｜　3%NaCl '+f2(ml3)+' ml（静脉慢滴需稀释，症状性才用）'+
     '<br><span style="color:var(--ink3)">补充期间每8-12h复查血钠，达目标即停补缺、回归维持量</span>';
 }
+function setMode(m){
+  document.getElementById('copyMode').value=m;
+  try{localStorage.setItem('oralSuppMode',m);}catch(e){}
+  ['simple','full','ledger'].forEach(function(x){
+    var el=document.getElementById('mode_'+x);
+    if(el) el.style.background=x===m?'var(--teal)':'';
+    if(el) el.style.color=x===m?'#fff':'';
+  });
+  var hints={simple:'只含医嘱行,抄HIS用',full:'含抬头+每行拆分账',ledger:'抬头+行尾渗透压,交接/自备用'};
+  var h2=document.getElementById('modeHint'); if(h2) h2.textContent=hints[m];
+  var el=document.getElementById('orderPreview'); if(el) el.textContent=orderText();
+}
 function recalc(){
   var c=calc();
   renderMilk(c); renderRows(c); renderFeed(c); renderOrderCard();
+  var el=document.getElementById('orderPreview'); if(el) el.textContent=orderText();
   slotAutoSave();
 }
 function copyOrder(){
@@ -934,6 +969,8 @@ function init(){
     var el=document.getElementById(f); if(el){el.oninput=recalc;el.onchange=recalc;}
   });
   ['naLow','naLowTgt'].forEach(function(f){var el=document.getElementById(f);if(el){el.oninput=naLowCalc;el.onchange=naLowCalc;}});
+  var m=null; try{m=localStorage.getItem('oralSuppMode');}catch(e){}
+  setMode(m||'simple');
   applyGA(); recalc(); switchPage(1);
 }
 init();
