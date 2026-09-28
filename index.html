@@ -596,7 +596,8 @@ function renderSupps(){
     var quick = s.quick? '<span class="dotbtn" onclick="setTgt(\'fe\',2.5)">预防2.5</span><span class="dotbtn" onclick="setTgt(\'fe\',5)">治疗5</span>' : '';
     d.innerHTML =
       '<div class="tile-head"><div class="ion-name"><div class="switch'+(s.on?' on':'')+'" onclick="tg(\''+s.key+'\')"></div>'+s.nm+
-      '<span class="tag range">'+s.rng+'</span>'+(quick?'<span>'+quick+'</span>':'')+'</div></div>'+
+      '<span class="tag range">'+s.rng+'</span>'+(quick?'<span>'+quick+'</span>':'')+
+      '<span class="dotbtn" style="margin-left:auto;" onclick="copySingle(\''+s.key+'\')">📋 单开</span></div></div>'+
       '<div class="grid c3" style="gap:8px;">'+
         tgtHtml+
         (s.fixed?'':'<label class="fld"><span class="lab">产品</span><select class="inp" id="p_'+s.key+'">'+opts+'</select></label>')+
@@ -720,18 +721,39 @@ function orderRows(){
   function tail(o){ var grp=c.osmMap[o.fn]; return (grp&&grp.osm)?('渗透压'+(Math.round(grp.osm*10)/10)):''; }
   function prodOf(key){return CONC[key][parseInt(g('p_'+key)||0)||0];}
   var rows=[];
-  function add(name,doseML,rt,fq,remark){rows.push({name:name,ml:doseML,route:rt,fq:fq,remark:remark});}
-  if(c.out.ca&&c.out.ca.need>0&&!c.out.ca.tiny) add(prodOf('ca').ord,f2(c.out.ca.ml),route,g('f_ca'),'与奶同服 总钙'+f2(c.out.ca.tgt)+'=奶'+f2(c.out.ca.milk)+'+药'+f2(c.out.ca.need)+','+tail(c.out.ca));
-  if(c.out.phos&&c.out.phos.need>0&&!c.out.phos.tiny) add(prodOf('phos').ord,f2(c.out.phos.ml),route,g('f_phos'),'总磷'+f2(c.out.phos.tgt)+'=奶'+f2(c.out.phos.milk)+'+药'+f2(c.out.phos.need)+' 含钠'+f2(c.out.phos.naFromPhos)+'mmol/kg,'+tail(c.out.phos));
-  if(c.out.fe&&c.out.fe.need>0&&!c.out.fe.tiny) add(prodOf('fe').ord,f2(c.out.fe.ml),route,g('f_fe'),'总铁'+f2(c.out.fe.tgt)+'=奶'+f2(c.out.fe.milk)+'+药'+f2(c.out.fe.need)+','+tail(c.out.fe));
-  if(c.out.zn&&c.out.zn.need>0&&!c.out.zn.tiny) add(prodOf('zn').ord,f2(c.out.zn.ml),route,g('f_zn'),'总锌'+f2(c.out.zn.tgt)+'=奶'+f2(c.out.zn.milk)+'+药'+f2(c.out.zn.need)+','+tail(c.out.zn));
-  if(c.out.na&&c.out.na.need>0&&!c.out.na.tiny) add(prodOf('na').ord,f2(c.out.na.ml),route,g('f_na'),'入奶 总钠'+f2(num(g('t_na')))+'=奶'+f2(c.out.na.milk)+(c.naExtra>0?'+瑞安吉'+f2(c.naExtra):'')+'+药'+f2(c.out.na.need)+','+tail(c.out.na));
-  if(c.out.k&&c.out.k.need>0&&!c.out.k.tiny) add(prodOf('k').ord,f2(c.out.k.ml),route,g('f_k'),'入奶 总钾'+f2(num(g('t_k')))+'=奶'+f2(c.out.k.milk)+'+药'+f2(c.out.k.need)+','+tail(c.out.k));
-  if(c.out.mg2&&c.out.mg2.need>0&&!c.out.mg2.tiny) add(prodOf('mg2').ord,f2(c.out.mg2.ml),route,g('f_mg2'),'镁'+f2(c.out.mg2.need)+'mg/kg/d');
-  if(c.out.vd) add(prodOf('vd').ord,num(g('t_vd'))+'(iu)','口服','qd','');
-  if(c.out.ad) add(prodOf('ad').ord,num(g('t_ad'))+'(iu)','口服','qd','');
+  function add(key,name,doseML,rt,fq,remark){rows.push({singleKey:key,name:name,ml:doseML,route:rt,fq:fq,remark:remark});}
+  if(c.out.ca&&c.out.ca.need>0&&!c.out.ca.tiny) add('ca',prodOf('ca').ord,f2(c.out.ca.ml),route,g('f_ca'),'与奶同服 总钙'+f2(c.out.ca.tgt)+'=奶'+f2(c.out.ca.milk)+'+药'+f2(c.out.ca.need)+','+tail(c.out.ca));
+  if(c.out.phos&&c.out.phos.need>0&&!c.out.phos.tiny) add('phos',prodOf('phos').ord,f2(c.out.phos.ml),route,g('f_phos'),'总磷'+f2(c.out.phos.tgt)+'=奶'+f2(c.out.phos.milk)+'+药'+f2(c.out.phos.need)+' 含钠'+f2(c.out.phos.naFromPhos)+'mmol/kg,'+tail(c.out.phos));
+  if(c.out.fe&&c.out.fe.need>0&&!c.out.fe.tiny) add('fe',prodOf('fe').ord,f2(c.out.fe.ml),route,g('f_fe'),'总铁'+f2(c.out.fe.tgt)+'=奶'+f2(c.out.fe.milk)+'+药'+f2(c.out.fe.need)+','+tail(c.out.fe));
+  if(c.out.zn&&c.out.zn.need>0&&!c.out.zn.tiny) add('zn',prodOf('zn').ord,f2(c.out.zn.ml),route,g('f_zn'),'总锌'+f2(c.out.zn.tgt)+'=奶'+f2(c.out.zn.milk)+'+药'+f2(c.out.zn.need)+','+tail(c.out.zn));
+  if(c.out.na&&c.out.na.need>0&&!c.out.na.tiny) add('na',prodOf('na').ord,f2(c.out.na.ml),route,g('f_na'),'入奶 总钠'+f2(num(g('t_na')))+'=奶'+f2(c.out.na.milk)+(c.naExtra>0?'+瑞安吉'+f2(c.naExtra):'')+'+药'+f2(c.out.na.need)+','+tail(c.out.na));
+  if(c.out.k&&c.out.k.need>0&&!c.out.k.tiny) add('k',prodOf('k').ord,f2(c.out.k.ml),route,g('f_k'),'入奶 总钾'+f2(num(g('t_k')))+'=奶'+f2(c.out.k.milk)+'+药'+f2(c.out.k.need)+','+tail(c.out.k));
+  if(c.out.mg2&&c.out.mg2.need>0&&!c.out.mg2.tiny) add('mg2',prodOf('mg2').ord,f2(c.out.mg2.ml),route,g('f_mg2'),'镁'+f2(c.out.mg2.need)+'mg/kg/d');
+  if(c.out.vd) add('vd',prodOf('vd').ord,num(g('t_vd'))+'(iu)','口服','qd','');
+  if(c.out.ad) add('ad',prodOf('ad').ord,num(g('t_ad'))+'(iu)','口服','qd','');
   return {c:c, route:route, rows:rows};
 }
+/* 单药医嘱: 只要一个补剂的行 */
+function singleOrderText(key){
+  var c=calc(); var R=orderRows();
+  var row=R.rows.find(function(r){return r.singleKey===key;});
+  var head='床号'+(g('bed')||'__')+' '+(g('pname')||'__')+' W'+(g('wt')||'__')+'kg 胎龄'+(g('ga')||'__')+'+'+(num(g('gad')))+'d DOL'+(g('dol')||'__')+'d '+
+    g('milk')+' 每顿'+f2(c.Vf)+'ml×'+c.nf+'顿('+f2(c.mi.v)+'ml/kg/d) q'+(24/c.nf).toFixed(0)+'h '+g('route');
+  if(!row) return head+'\n（该补剂当前无缺口或未开启）';
+  var isVit=row.name.indexOf('维生素')===0;
+  var dose=isVit? row.ml : row.ml+'(ml)';
+  var mode=g('copyMode')||'simple';
+  var line=row.name+' '+dose+' '+(isVit?'口服':row.route)+' '+row.fq+(row.remark&&mode!=='simple'? ' '+row.remark:'');
+  return head+'\n'+line+'\n——口服补剂医嘱台·上级审核后录入——';
+}
+function copySingle(key,ev){
+  var t=singleOrderText(key);
+  var done=function(){toast('已复制单药医嘱');};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done);}
+  else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+}
+
 /* 纯文本（复制/长图用）——三种模式: 精简(默认)/完整/带账双行 */
 function orderText(){
   var R=orderRows(), c=R.c;
